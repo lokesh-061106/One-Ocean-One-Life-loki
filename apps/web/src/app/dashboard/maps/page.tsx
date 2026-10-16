@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { Map, Plus, Edit, Trash2, Eye, MapPin, Navigation, Layers, MoreHorizontal, Phone, CheckCircle, X } from "lucide-react";
+import dynamic from "next/dynamic";
+import { Plus, Edit, Trash2, MapPin, Navigation, MoreHorizontal, Phone, CheckCircle, X } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +14,20 @@ import { useDashboardData, type DashboardHotspot, type DashboardEmergencyContact
 import { CrudForm, Field } from "@/components/ui/crud-form";
 import { zones } from "@/lib/data";
 import { formatNumber } from "@/lib/utils";
+
+/* MapLibre is client-only; keep it out of the SSR bundle (same
+   pattern as the storefront /map page). */
+const DashboardHotspotMap = dynamic(
+  () => import("@/components/map/dashboard-hotspot-map"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="bg-ocean-light rounded-xl h-96 flex items-center justify-center">
+        <p className="text-sm text-ocean-text-secondary">Loading map…</p>
+      </div>
+    ),
+  }
+);
 
 const densityColors: Record<string, string> = { low: "bg-ocean-blue text-white", medium: "bg-ocean-warning text-white", high: "bg-ocean-coral text-white", very_high: "bg-ocean-danger text-white" };
 const typeColors: Record<string, string> = { "Coast Guard": "bg-ocean-blue/10 text-ocean-blue", Police: "bg-ocean-info/10 text-ocean-info", Hospital: "bg-ocean-green/10 text-ocean-green", Fire: "bg-ocean-coral/10 text-ocean-coral", Emergency: "bg-ocean-danger/10 text-ocean-danger" };
@@ -120,9 +135,18 @@ export default function MapsPage() {
                   <Card className="lg:col-span-2">
                     <CardHeader><CardTitle>Hotspot Map</CardTitle><CardDescription>Geographic distribution of contribution hotspots</CardDescription></CardHeader>
                     <CardContent>
-                      <div className="bg-ocean-light rounded-xl h-96 flex items-center justify-center">
-                        <div className="text-center"><Map className="h-12 w-12 text-ocean-blue mx-auto mb-4" /><p className="text-ocean-navy font-medium">Interactive Map</p><p className="text-sm text-ocean-text-secondary">MapLibre GL Integration</p></div>
-                      </div>
+                      <DashboardHotspotMap
+                        hotspots={hotspots.map((hs) => ({
+                          id: hs.id,
+                          name: hs.name,
+                          lat: hs.lat,
+                          lng: hs.lng,
+                          density: hs.density,
+                          contributions: hs.contributions,
+                          zoneName: zones.find((z) => z.id === hs.zone_id)?.name,
+                        }))}
+                        height={384}
+                      />
                     </CardContent>
                   </Card>
                   <Card>

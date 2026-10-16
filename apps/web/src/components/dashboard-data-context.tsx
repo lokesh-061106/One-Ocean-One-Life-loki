@@ -180,8 +180,9 @@ function mapHotspotFromApi(h: any): DashboardHotspot {
       lng = h.center.coordinates[0];
       lat = h.center.coordinates[1];
     } else if (typeof h.center === "string") {
-      const parts = h.center.replace("POINT (", "").replace(")", "").split(" ");
-      if (parts.length === 2) { lng = parseFloat(parts[0]); lat = parseFloat(parts[1]); }
+      // Handles "SRID=4326;POINT (lng lat)", "POINT(lng lat)", etc.
+      const m = h.center.match(/POINT\s*\(\s*(-?[\d.]+)\s+(-?[\d.]+)\s*\)/i);
+      if (m) { lng = parseFloat(m[1]); lat = parseFloat(m[2]); }
     }
   }
   return {
