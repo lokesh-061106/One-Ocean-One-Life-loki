@@ -1,0 +1,13 @@
+{
+  "name": "o3l",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n mobile,web -c cyan,magenta --kill-others \"npm --prefix apps/mobile start\" \"npm --prefix apps/web dev\"",
+    "dev:mobile": "npm --prefix apps/mobile start",
+    "dev:web": "npm --prefix apps/web dev"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.5"
+  }
+}
