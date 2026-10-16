@@ -54,19 +54,24 @@ export default function ObservationsPage() {
     <div className="min-h-screen bg-ocean-foam">
       <Header />
       <main>
-        <section className="bg-gradient-to-r from-ocean-coral to-ocean-warning py-16">
-          <div className="max-w-7xl mx-auto px-4 text-center">
-            <Badge variant="secondary" className="mb-4 bg-white/20 text-white border-white/30">
-              Community Eyes on the Coast
-            </Badge>
-            <h1 className="text-4xl font-bold text-white mb-4">Observations</h1>
-            <p className="text-lg text-ocean-sand max-w-2xl mx-auto">
-              Pollution, habitats, plants and wildlife spotted by coastal communities.
+        <section className="relative overflow-hidden bg-[#041c33] text-white py-14 sm:py-18 border-b border-sky-900/40">
+          <div className="absolute inset-0 bg-gradient-to-r from-[#021120] via-[#052647] to-[#073a66] opacity-90 pointer-events-none" />
+          <div className="absolute -top-32 -right-32 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="relative max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 text-center">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-400/15 text-amber-200 border border-amber-400/30 mb-4 tracking-wide uppercase">
+              Community Sentinel Network
+            </span>
+            <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight mb-3">
+              Coastal Marine Observations
+            </h1>
+            <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed">
+              Field observations of sensitive marine habitats, coastal flora, coral condition, and shoreline anomalies submitted by coastal observers.
             </p>
           </div>
         </section>
 
-        <div className="max-w-7xl mx-auto px-4 py-12">
+        <div className="max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 py-10">
           <div className="flex flex-wrap gap-2 mb-8">
             <button
               onClick={() => setActiveCategory("")}
@@ -94,7 +99,7 @@ export default function ObservationsPage() {
           )}
 
           {!loading && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {observations.map((item) => (
                 <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
                   {item.photo ? (

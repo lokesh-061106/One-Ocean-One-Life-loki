@@ -103,14 +103,23 @@ export default function EventsPage() {
     <div className="min-h-screen bg-ocean-foam">
       <Header />
       <main>
-        <section className="bg-gradient-to-r from-ocean-deep to-ocean-blue py-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <Badge variant="secondary" className="mb-4 bg-white/20 text-white border-white/30">Community Events</Badge>
-            <h1 className="text-4xl font-bold text-white mb-4">Events</h1>
-            <p className="text-lg text-ocean-sand max-w-2xl mx-auto">Join {events.length}+ community events, workshops, and conservation activities.</p>
+        <section className="relative overflow-hidden bg-[#041c33] text-white py-14 sm:py-18 border-b border-sky-900/40">
+          <div className="absolute inset-0 bg-gradient-to-r from-[#021120] via-[#052647] to-[#073a66] opacity-90 pointer-events-none" />
+          <div className="absolute -top-32 -right-32 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="relative max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 text-center">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sky-400/15 text-sky-200 border border-sky-400/30 mb-4 tracking-wide uppercase">
+              Community Calendar
+            </span>
+            <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight mb-3">
+              Coastal Community Events
+            </h1>
+            <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed">
+              Join marine workshops, community clean-ups, traditional fishing seminars, and conservation drives across coastal villages.
+            </p>
           </div>
         </section>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 py-10">
           <div className="flex flex-col sm:flex-row gap-4 mb-8">
             <div className="relative flex-1"><Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ocean-muted" /><Input placeholder="Search events..." className="pl-10" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} /></div>
             <Button><Plus className="mr-2 h-4 w-4" />Create Event</Button>
@@ -122,7 +131,7 @@ export default function EventsPage() {
               </Button>
             ))}
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredEvents.map((event) => {
               const capacityPercent = Math.round((event.participants_count / event.max_participants) * 100);
               return (

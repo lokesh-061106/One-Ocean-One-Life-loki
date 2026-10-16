@@ -49,8 +49,9 @@ urlpatterns = [
     # Lean season / fishing ban
     path('lean-season/', views.LeanSeasonView.as_view(), name='lean_season'),
 
-    # Map
+    # Map & Location Calibration
     path('map-points/', views.MapPointsView.as_view(), name='map_points'),
+    path('calibrate-locations/', views.CalibrateLocationsView.as_view(), name='calibrate_locations'),
 
     # Provider console
     path('provider/dashboard/', views.ProviderDashboardView.as_view(), name='provider_dashboard'),

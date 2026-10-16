@@ -708,29 +708,30 @@ export default function RecognitionPage() {
 
       <main>
         {/* ---------------- hero ---------------- */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-ocean-navy via-ocean-blue to-cyan-600 pb-28 pt-16">
+        <section className="relative overflow-hidden bg-[#041c33] text-white pb-28 pt-16 border-b border-sky-900/40">
+          <div className="absolute inset-0 bg-gradient-to-r from-[#021120] via-[#052647] to-[#073a66] opacity-90 pointer-events-none" />
           <div className="pointer-events-none absolute inset-0 opacity-30">
-            <div className="absolute -left-20 top-10 h-64 w-64 rounded-full bg-white/20 blur-3xl animate-float" />
-            <div className="absolute right-10 top-24 h-40 w-40 rounded-full bg-cyan-300/30 blur-2xl animate-float" style={{ animationDelay: "1.2s" }} />
-            <div className="absolute left-1/3 bottom-10 h-52 w-52 rounded-full bg-emerald-300/20 blur-3xl animate-pulse-slow" />
+            <div className="absolute -left-20 top-10 h-64 w-64 rounded-full bg-sky-400/20 blur-3xl" />
+            <div className="absolute right-10 top-24 h-40 w-40 rounded-full bg-cyan-300/30 blur-2xl" />
+            <div className="absolute left-1/3 bottom-10 h-52 w-52 rounded-full bg-emerald-400/20 blur-3xl" />
           </div>
 
-          <div className="relative mx-auto max-w-6xl px-4 text-center">
-            <Badge className="mb-5 border-white/30 bg-white/15 text-white animate-fade-in-down">
-              <Sparkles className="mr-1.5 h-3.5 w-3.5" /> Recognition &amp; Scoreboard
-            </Badge>
-            <h1 className="mb-4 text-4xl font-extrabold tracking-tight text-white md:text-5xl animate-fade-in-up">
+          <div className="relative mx-auto max-w-[1720px] px-4 sm:px-6 lg:px-8 xl:px-10 text-center">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sky-400/15 text-sky-200 border border-sky-400/30 mb-5 tracking-wide uppercase">
+              <Sparkles className="h-3.5 w-3.5" /> Recognition &amp; Scoreboard
+            </span>
+            <h1 className="mb-4 text-3xl sm:text-5xl font-black tracking-tight text-white">
               Every verified drop builds the ocean
-              <span className="relative ml-2 inline-block bg-gradient-to-r from-amber-200 to-yellow-100 bg-clip-text text-transparent">
+              <span className="relative ml-2 inline-block text-amber-300">
                 ledger
               </span>
             </h1>
-            <p className="mx-auto mb-8 max-w-2xl text-base text-cyan-50/90 md:text-lg animate-fade-in-up" style={{ animationDelay: "80ms" }}>
+            <p className="mx-auto mb-8 max-w-3xl text-base text-slate-300 md:text-lg">
               Final Score = B × Q × V × I — base points × quality × verification × impact.
-              Reach 25 verified contributions to unlock the data marketplace.
+              Reach 25 verified contributions to unlock the verified marketplace.
             </p>
 
-            <div className="mx-auto grid max-w-4xl grid-cols-2 gap-3 md:grid-cols-4">
+            <div className="mx-auto grid max-w-5xl grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
               {[
                 { label: "Contributors", value: summary?.contributors ?? 0, icon: Users, delay: 120 },
                 { label: "Score points", value: summary?.total_points ?? 0, icon: Star, delay: 180 },
@@ -739,21 +740,21 @@ export default function RecognitionPage() {
               ].map((s) => (
                 <div
                   key={s.label}
-                  className="rounded-xl border border-white/20 bg-white/10 px-4 py-4 backdrop-blur-sm animate-fade-in-up hover-lift"
+                  className="rounded-xl border border-sky-400/25 bg-[#02182d]/80 px-4 py-4 backdrop-blur-sm hover:border-sky-400/50 transition-colors shadow-lg"
                   style={{ animationDelay: `${s.delay}ms` }}
                 >
-                  <s.icon className="mx-auto mb-1.5 h-5 w-5 text-cyan-100" />
-                  <p className="text-2xl font-bold text-white">
+                  <s.icon className="mx-auto mb-1.5 h-5 w-5 text-sky-400" />
+                  <p className="text-2xl font-black text-white">
                     {loadingPublic ? "—" : <AnimatedNumber value={s.value} prefix={s.label === "Paid out (₹)" ? "₹" : ""} />}
                   </p>
-                  <p className="text-[11px] uppercase tracking-wider text-cyan-100/80">{s.label}</p>
+                  <p className="text-[11px] uppercase tracking-wider text-slate-300">{s.label}</p>
                 </div>
               ))}
             </div>
           </div>
 
           {/* wave */}
-          <svg className="absolute -bottom-px left-0 h-20 w-full text-ocean-foam" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden>
+          <svg className="absolute -bottom-px left-0 h-16 w-full text-ocean-foam" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden>
             <path
               fill="currentColor"
               d="M0,64 C240,120 480,0 720,32 C960,64 1200,128 1440,72 L1440,120 L0,120 Z"
@@ -762,7 +763,7 @@ export default function RecognitionPage() {
         </section>
 
         {/* ---------------- marketplace gate + my score ---------------- */}
-        <section className="relative z-10 mx-auto -mt-16 max-w-6xl px-4 pb-4">
+        <section className="relative z-10 mx-auto -mt-12 max-w-[1720px] px-4 sm:px-6 lg:px-8 xl:px-10 pb-4">
           <div className="grid gap-4 lg:grid-cols-3">
             {/* my score */}
             <GlassCard className="lg:col-span-2 animate-fade-in-up">
@@ -891,7 +892,7 @@ export default function RecognitionPage() {
         </section>
 
         {/* ---------------- scoreboard ---------------- */}
-        <section className="mx-auto max-w-6xl px-4 py-12">
+        <section className="mx-auto max-w-[1720px] px-4 sm:px-6 lg:px-8 xl:px-10 py-12">
           <SectionHeader
             title="Scoreboard"
             subtitle="Individuals, villages, districts, states, coastal regions and awareness zones"
@@ -1057,7 +1058,7 @@ export default function RecognitionPage() {
 
         {/* ---------------- tier ladder ---------------- */}
         <section className="bg-white/60 py-12">
-          <div className="mx-auto max-w-6xl px-4">
+          <div className="mx-auto max-w-[1720px] px-4 sm:px-6 lg:px-8 xl:px-10">
             <SectionHeader title="Tier ladder" subtitle="Ranks unlocked by verified contributions" />
             {loadingPublic ? (
               <SkeletonList count={2} />
@@ -1100,7 +1101,7 @@ export default function RecognitionPage() {
         </section>
 
         {/* ---------------- badges + awards ---------------- */}
-        <section className="mx-auto max-w-6xl px-4 py-12">
+        <section className="mx-auto max-w-[1720px] px-4 sm:px-6 lg:px-8 xl:px-10 py-12">
           <div className="grid gap-8 lg:grid-cols-2">
             <div>
               <SectionHeader title="Badges" subtitle="Earned automatically from your contribution history" />

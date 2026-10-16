@@ -98,34 +98,46 @@ export default function SightingsPage() {
     <div className="min-h-screen bg-ocean-foam">
       <Header />
       <main>
-        <section className="bg-gradient-to-r from-ocean-coral to-ocean-blue py-16">
-          <div className="max-w-7xl mx-auto px-4 text-center">
-            <Badge variant="secondary" className="mb-4 bg-white/20 text-white border-white/30">Marine Sightings</Badge>
-            <h1 className="text-4xl font-bold text-white mb-4">Marine Sightings</h1>
-            <p className="text-lg text-ocean-sand max-w-2xl mx-auto">Document marine life observations from Tamil Nadu coast.</p>
+        <section className="relative overflow-hidden bg-[#041c33] text-white py-16 sm:py-20">
+          <div className="absolute inset-0 bg-gradient-to-r from-[#021120] via-[#052647] to-[#073a66]" />
+          <div className="pointer-events-none absolute inset-0 opacity-15 mix-blend-luminosity">
+            <img src="/shg/p1-banner-boats.webp" alt="" className="h-full w-full object-cover" />
+          </div>
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#021120] via-transparent to-[#021120]/75" />
+
+          <div className="relative mx-auto max-w-[1720px] px-4 sm:px-6 lg:px-8 xl:px-10 text-center">
+            <Badge variant="secondary" className="mb-4 bg-sky-950/80 text-amber-300 border-sky-400/40 font-bold tracking-wider uppercase text-xs">
+              Community Biodiversity Log
+            </Badge>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4 drop-shadow-md">
+              Marine Sightings
+            </h1>
+            <p className="text-sm sm:text-base md:text-lg text-slate-100 max-w-2xl mx-auto font-medium">
+              Document and explore marine mammal, turtle, and marine life observations along Southern Indian coasts.
+            </p>
           </div>
         </section>
 
-        <div className="max-w-7xl mx-auto px-4 py-12">
+        <div className="mx-auto max-w-[1720px] px-4 sm:px-6 lg:px-8 xl:px-10 py-12">
           <div className="flex flex-wrap gap-2 mb-8">
             <button
               onClick={() => setActiveCategory("")}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-xs ${
                 activeCategory === ""
-                  ? "bg-ocean-blue text-white"
-                  : "bg-white text-ocean-text-secondary border border-ocean-border hover:border-ocean-blue hover:text-ocean-blue"
+                  ? "bg-ocean-navy text-white shadow-md scale-105"
+                  : "bg-white text-ocean-text-secondary border border-slate-200 hover:border-ocean-blue hover:text-ocean-blue"
               }`}
             >
-              All
+              All Categories
             </button>
             {categories.map((category) => (
               <button
                 key={category.id}
                 onClick={() => setActiveCategory(category.id === activeCategory ? "" : category.id)}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-xs ${
                   activeCategory === category.id
-                    ? "bg-ocean-blue text-white"
-                    : "bg-white text-ocean-text-secondary border border-ocean-border hover:border-ocean-blue hover:text-ocean-blue"
+                    ? "bg-ocean-navy text-white shadow-md scale-105"
+                    : "bg-white text-ocean-text-secondary border border-slate-200 hover:border-ocean-blue hover:text-ocean-blue"
                 }`}
               >
                 {category.icon && <span className="mr-1">{category.icon}</span>}
@@ -137,24 +149,24 @@ export default function SightingsPage() {
             const active = categories.find((c) => c.id === activeCategory);
             if (!active || !active.species?.length) return null;
             return (
-              <div className="mb-8 p-4 bg-white border border-ocean-border rounded-lg">
-                <p className="text-sm font-semibold text-ocean-navy mb-2">Species in this category</p>
+              <div className="mb-8 p-4 bg-white border border-slate-200 rounded-2xl shadow-xs">
+                <p className="text-xs font-extrabold uppercase tracking-wider text-ocean-blue mb-2">Species in this category</p>
                 <ul className="flex flex-wrap gap-2">
                   {active.species.map((species) => (
                     <li
                       key={species.id}
-                      className="px-3 py-1 rounded-full bg-ocean-foam text-sm text-ocean-text-secondary border border-ocean-border"
+                      className="px-3 py-1 rounded-lg bg-ocean-foam text-xs font-medium text-ocean-navy border border-slate-200/80"
                     >
                       {species.common_name}
-                      {species.scientific_name && <span className="italic text-ocean-blue"> {species.scientific_name}</span>}
-                      {species.source_ref && <span className="ml-1 text-xs text-ocean-muted">({species.source_ref})</span>}
+                      {species.scientific_name && <span className="italic text-ocean-blue"> ({species.scientific_name})</span>}
+                      {species.source_ref && <span className="ml-1 text-[10px] text-ocean-muted">[{species.source_ref}]</span>}
                     </li>
                   ))}
                 </ul>
               </div>
             );
           })()}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {sightings.map((sighting) => {
               const contrib = typeof sighting.contribution === "object" ? sighting.contribution : null;
               const user = sighting.contributor || (contrib?.user ? resolveName(contrib.user) : "");

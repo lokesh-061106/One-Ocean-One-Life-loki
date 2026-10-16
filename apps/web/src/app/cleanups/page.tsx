@@ -34,44 +34,49 @@ export default function CleanupsPage() {
     <div className="min-h-screen bg-ocean-foam">
       <Header />
       <main>
-        <section className="bg-gradient-to-r from-ocean-green to-ocean-deep py-16">
-          <div className="max-w-7xl mx-auto px-4 text-center">
-            <Badge variant="secondary" className="mb-4 bg-white/20 text-white border-white/30">
-              Coastal Clean-ups
-            </Badge>
-            <h1 className="text-4xl font-bold text-white mb-4">Beach Clean-ups</h1>
-            <p className="text-lg text-ocean-sand max-w-2xl mx-auto">
-              Community clean-up drives recorded along the coast.
+        <section className="relative overflow-hidden bg-[#041c33] text-white py-14 sm:py-18 border-b border-sky-900/40">
+          <div className="absolute inset-0 bg-gradient-to-r from-[#021120] via-[#052647] to-[#073a66] opacity-90 pointer-events-none" />
+          <div className="absolute -top-32 -right-32 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="relative max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 text-center">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-400/15 text-emerald-200 border border-emerald-400/30 mb-4 tracking-wide uppercase">
+              Community Action
+            </span>
+            <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight mb-3">
+              Beach &amp; Coastal Clean-ups
+            </h1>
+            <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed">
+              Verified community cleanup drives recorded along India&apos;s coastline. Track volunteer participation and circular marine debris recovery.
             </p>
           </div>
         </section>
 
         {!loading && cleanups.length > 0 && (
-          <div className="max-w-7xl mx-auto px-4 pt-12">
+          <div className="max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 pt-10">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="bg-white rounded-xl border border-ocean-border p-6 text-center">
-                <p className="text-3xl font-bold text-ocean-navy">{cleanups.length}</p>
-                <p className="text-sm text-ocean-text-secondary">Clean-ups recorded</p>
+              <div className="bg-white rounded-xl border border-ocean-border p-6 text-center shadow-sm">
+                <p className="text-3xl font-extrabold text-ocean-navy">{cleanups.length}</p>
+                <p className="text-xs uppercase tracking-wider text-ocean-text-secondary mt-1">Clean-ups Recorded</p>
               </div>
-              <div className="bg-white rounded-xl border border-ocean-border p-6 text-center">
-                <p className="text-3xl font-bold text-ocean-green">{totalPeople.toLocaleString()}</p>
-                <p className="text-sm text-ocean-text-secondary">Volunteers participated</p>
+              <div className="bg-white rounded-xl border border-ocean-border p-6 text-center shadow-sm">
+                <p className="text-3xl font-extrabold text-emerald-600">{totalPeople.toLocaleString()}</p>
+                <p className="text-xs uppercase tracking-wider text-ocean-text-secondary mt-1">Volunteers Mobilized</p>
               </div>
-              <div className="bg-white rounded-xl border border-ocean-border p-6 text-center">
-                <p className="text-3xl font-bold text-ocean-coral">{Math.round(totalWaste).toLocaleString()} kg</p>
-                <p className="text-sm text-ocean-text-secondary">Waste collected</p>
+              <div className="bg-white rounded-xl border border-ocean-border p-6 text-center shadow-sm">
+                <p className="text-3xl font-extrabold text-amber-600">{Math.round(totalWaste).toLocaleString()} kg</p>
+                <p className="text-xs uppercase tracking-wider text-ocean-text-secondary mt-1">Debris Recovered</p>
               </div>
             </div>
           </div>
         )}
 
-        <div className="max-w-7xl mx-auto px-4 py-12">
+        <div className="max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 py-10">
           {loading && (
             <div className="text-center py-16 text-ocean-text-secondary">Loading clean-ups...</div>
           )}
 
           {!loading && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {cleanups.map((item) => (
                 <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col">
                   {item.photos?.[0] ? (

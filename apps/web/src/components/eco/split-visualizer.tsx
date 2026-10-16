@@ -76,6 +76,7 @@ export function SplitVisualizer({
           <div className="flex items-center rounded-lg border border-ocean-border bg-ocean-foam px-3 py-1.5 focus-within:border-ocean-blue">
             <span className="mr-1 font-bold text-ocean-navy">₹</span>
             <input
+              suppressHydrationWarning
               id="split-amount"
               type="number"
               min={100}
@@ -89,6 +90,7 @@ export function SplitVisualizer({
         <div className="flex flex-wrap gap-2">
           {PRESETS.map((p) => (
             <button
+              suppressHydrationWarning
               key={p}
               onClick={() => setAmount(p)}
               className={cn(

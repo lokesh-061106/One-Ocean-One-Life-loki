@@ -42,6 +42,7 @@ export function Option2Nav() {
             <DropdownMenu key={group.key}>
               <DropdownMenuTrigger asChild>
                 <button
+                  suppressHydrationWarning
                   className={cn(
                     "flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium transition-all duration-200",
                     "focus-visible:ring-2 focus-visible:ring-ocean-blue focus-visible:ring-offset-2",

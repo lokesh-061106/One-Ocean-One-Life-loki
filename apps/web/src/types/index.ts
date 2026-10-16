@@ -462,6 +462,13 @@ export interface TourismOpportunity {
   meeting_point?: string;
   images?: string[];
   image?: string | null;
+  family_phone?: string | null;
+  family_verified?: boolean;
+  family_members_count?: number | null;
+  contact_phone?: string | null;
+  verification_code?: string | null;
+  google_maps_url?: string | null;
+  escrow_guarantee?: string | null;
   is_offshore?: boolean;
   lean_season_friendly?: boolean;
   weekday?: string;
@@ -548,6 +555,9 @@ export interface FisherFamily {
   total_earnings?: string;
   latitude?: number | null;
   longitude?: number | null;
+  phone?: string | null;
+  verification_id?: string | null;
+  google_maps_url?: string | null;
 }
 
 export interface EcoPackage {
@@ -649,6 +659,7 @@ export interface EcoReview {
 
 export interface LeanSeasonData {
   active: boolean;
+  simulated?: boolean;
   checked_on: string;
   message: string;
   windows: {

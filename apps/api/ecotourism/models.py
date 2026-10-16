@@ -231,7 +231,18 @@ class TourismOpportunity(BaseModel):
     @property
     def booking_price(self):
         """Unit price used when creating a booking (list price floor)."""
-        return self.price_min if self.price_min is not None else 0
+        if self.price_min is not None:
+            return self.price_min
+        if self.price_range:
+            import re
+            from decimal import Decimal
+            m = re.search(r'(\d[\d,]*)', self.price_range)
+            if m:
+                try:
+                    return Decimal(m.group(1).replace(',', ''))
+                except Exception:
+                    pass
+        return 0
 
 
 class ExperiencePackage(BaseModel):
