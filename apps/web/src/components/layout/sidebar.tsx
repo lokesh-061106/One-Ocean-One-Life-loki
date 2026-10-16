@@ -4,7 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard, Users, FileText, Award, Map, BarChart3, Settings, Bell, ChevronLeft, ChevronRight, LogOut, Waves, Fish, Eye, Mic, Ticket, Compass, Menu, ShieldCheck, ListOrdered,
+  LayoutDashboard, Users, FileText, Award, Map, BarChart3, Settings, Bell, ChevronLeft, ChevronRight, LogOut, Waves, Fish, Eye, Mic, Ticket, Compass, Menu, ShieldCheck, ListOrdered, Home,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -66,7 +66,10 @@ export function Sidebar({ collapsed = false, onToggle }: SidebarProps) {
   const canConfigureHeader = user?.role === "admin" || user?.role === "super_admin";
 
   const sidebarGroups = [
-    { title: "Overview", items: [{ href: "/dashboard", label: "Dashboard", icon: LayoutDashboard }] },
+    { title: "Overview", items: [
+      { href: "/", label: "Home", icon: Home },
+      { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    ] },
     { title: "Ecotourism", items: [
       { href: "/ecotourism", label: "Explore Experiences", icon: Compass },
       { href: "/ecotourism/bookings", label: "My Bookings & Ledger", icon: Ticket },

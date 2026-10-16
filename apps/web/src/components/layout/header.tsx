@@ -181,21 +181,23 @@ export function Header() {
         <Search className="h-5 w-5" />
       </Button>
 
-      {/* Cart */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="relative"
-        onClick={() => setCartOpen(true)}
-        aria-label="Open cart"
-      >
-        <ShoppingCart className="h-5 w-5" />
-        {mounted && totalItems > 0 && (
-          <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-ocean-blue text-white text-xs font-bold flex items-center justify-center">
-            {totalItems > 99 ? "99+" : totalItems}
-          </span>
-        )}
-      </Button>
+      {/* Cart — only when the admin "Marketplace" menu item is visible */}
+      {menuFilter.isVisible("/marketplace") && (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="relative"
+          onClick={() => setCartOpen(true)}
+          aria-label="Open cart"
+        >
+          <ShoppingCart className="h-5 w-5" />
+          {mounted && totalItems > 0 && (
+            <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-ocean-blue text-white text-xs font-bold flex items-center justify-center">
+              {totalItems > 99 ? "99+" : totalItems}
+            </span>
+          )}
+        </Button>
+      )}
 
       {/* Notifications */}
       <div className="relative">
