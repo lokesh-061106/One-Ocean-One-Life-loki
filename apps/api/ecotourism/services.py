@@ -225,15 +225,46 @@ def is_offshore_blocked(experience: TourismOpportunity, on_date: date = None) ->
     return bool(windows)
 
 
-def lean_season_context(state: str = None, district: str = None, on_date: date = None) -> dict:
+def lean_season_context(state: str = None, district: str = None, on_date: date = None, simulate: bool = False) -> dict:
     """Full lean-season payload for the app banner + filtered listings."""
     on_date = on_date or timezone.localdate()
     windows = active_lean_windows(state=state, district=district, on_date=on_date)
-    active = bool(windows)
+
+    if simulate and not windows:
+        from locations.models import StateLeanPeriod
+        qs = StateLeanPeriod.objects.select_related('profile').filter(
+            start_month__isnull=False, end_month__isnull=False
+        )
+        if state:
+            qs = qs.filter(profile__state__iexact=state)
+        if district:
+            qs = qs.filter(Q(district__iexact=district) | Q(district=''))
+        for p in qs[:6]:
+            windows.append({
+                'id': str(p.id),
+                'state': p.profile.state,
+                'district': p.district,
+                'region_label': p.region_label,
+                'typical_period': p.typical_period,
+                'main_reason': p.main_reason,
+                'start_month': p.start_month,
+                'start_day': p.start_day,
+                'end_month': p.end_month,
+                'end_day': p.end_day,
+                'profile_id': str(p.profile_id),
+                'ban_relief_text': p.profile.ban_relief_text,
+                'lean_allowance_text': p.profile.lean_allowance_text,
+            })
+
+    active = bool(windows) or bool(simulate)
 
     experiences = TourismOpportunity.objects.filter(
         is_active=True, lean_season_friendly=True
     ).select_related('village', 'family', 'beach')
+    if state:
+        experiences = experiences.filter(
+            Q(village__district__state__iexact=state) | Q(village__isnull=True)
+        )
     if district:
         experiences = experiences.filter(
             Q(village__district__name__iexact=district) | Q(village__isnull=True)
@@ -258,7 +289,7 @@ def lean_season_context(state: str = None, district: str = None, on_date: date =
 
     message = ''
     if active:
-        regions = ', '.join(sorted({w['region_label'] or w['state'] for w in windows}))
+        regions = ', '.join(sorted({w['region_label'] or w['state'] for w in windows})) if windows else (state or 'Tamil Nadu, Kerala, Karnataka & Andhra Pradesh')
         message = (
             'Fishing activity is seasonally restricted in '
             f'{regions}. Explore alternative income opportunities in your village.'
@@ -266,6 +297,7 @@ def lean_season_context(state: str = None, district: str = None, on_date: date =
 
     return {
         'active': active,
+        'simulated': bool(simulate),
         'checked_on': on_date.isoformat(),
         'message': message,
         'windows': windows,

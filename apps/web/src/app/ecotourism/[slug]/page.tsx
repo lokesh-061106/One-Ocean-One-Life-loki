@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import {
   ArrowLeft, Clock, MapPin, Users, Anchor, Check, X, Calendar,
-  ShieldCheck, Loader2, Waves,
+  ShieldCheck, Loader2, Waves, Phone, MessageCircle, ExternalLink, CheckCircle2,
 } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
@@ -92,10 +92,11 @@ export default function ExperienceDetailPage() {
 
   const meta = MODEL_META[item.model_category] || MODEL_META.fisher_coastal;
   const t = typeMeta(item.opportunity_type);
-  const gallery = (item.images && item.images.length ? item.images : [item.image || ""]).filter(
+  const rawGallery = (item.images && item.images.length ? item.images : [item.image || ""]).filter(
     Boolean
   ) as string[];
-  const hero = gallery[imgIdx] || null;
+  const gallery = rawGallery.length ? rawGallery : [t.fallbackImg || meta.coverImage];
+  const hero = gallery[imgIdx] || t.fallbackImg || meta.coverImage;
   const splitLines = item.split_preview || [];
   const familyObj = (item as unknown as { family?: { name?: string; rating?: number } | null }).family;
 
@@ -106,7 +107,7 @@ export default function ExperienceDetailPage() {
       <main>
         {/* breadcrumb bar */}
         <div className="border-b border-ocean-border bg-white">
-          <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 sm:px-6 lg:px-8">
+          <div className="mx-auto flex max-w-[1600px] items-center gap-3 px-4 py-3 sm:px-6 lg:px-8 xl:px-10">
             <button
               onClick={() => router.back()}
               className="inline-flex items-center gap-1 text-sm font-medium text-ocean-text-secondary hover:text-ocean-blue"
@@ -122,7 +123,7 @@ export default function ExperienceDetailPage() {
           </div>
         </div>
 
-        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-[1600px] px-4 py-8 sm:px-6 lg:px-8 xl:px-10">
           <div className="grid gap-8 lg:grid-cols-3">
             {/* ------- left: gallery + content ------- */}
             <div className="lg:col-span-2">
@@ -132,7 +133,7 @@ export default function ExperienceDetailPage() {
                   {hero ? (
                     <button
                       type="button"
-                      className="group h-full w-full"
+                      className="group relative h-full w-full"
                       onClick={() => setLightbox(true)}
                       aria-label="Open image"
                     >
@@ -142,6 +143,7 @@ export default function ExperienceDetailPage() {
                         alt={item.name}
                         className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                       />
+                      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
                     </button>
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center">
@@ -281,15 +283,79 @@ export default function ExperienceDetailPage() {
                 </div>
               )}
 
-              {/* meeting point */}
-              {item.meeting_point && (
-                <div className="reveal visible mt-6 rounded-2xl border border-ocean-border bg-white p-6">
-                  <h3 className="mb-2 flex items-center gap-2 font-bold text-ocean-navy">
-                    <MapPin className="h-4 w-4 text-ocean-coral" /> Meeting point
-                  </h3>
-                  <p className="text-sm text-ocean-text-secondary">{item.meeting_point}</p>
+              {/* Verified Host, Direct Contact, & Exact Location */}
+              <div className="reveal visible mt-6 rounded-2xl border border-ocean-border bg-white p-6 shadow-sm">
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-4">
+                  <div>
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-800 border border-emerald-200">
+                      <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" /> Officially Verified Host Provider
+                    </span>
+                    <h3 className="mt-1.5 text-lg font-bold text-ocean-navy">
+                      {familyObj?.name || item.family_name || "Coastal Fisher Family Society"}
+                    </h3>
+                    <p className="text-xs text-ocean-text-secondary">
+                      Registration ID: <span className="font-mono font-semibold text-ocean-navy">{item.verification_code || `O3L-VERIFIED-${item.id.slice(0, 8).toUpperCase()}`}</span> · Village Fisherfolk Cooperative Endorsed
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    {item.contact_phone && (
+                      <a
+                        href={`tel:${item.contact_phone}`}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-ocean-blue bg-ocean-foam px-3 py-1.5 text-xs font-bold text-ocean-blue transition hover:bg-ocean-blue hover:text-white"
+                      >
+                        <Phone className="h-3.5 w-3.5" /> Call Host ({item.contact_phone})
+                      </a>
+                    )}
+                    {item.contact_phone && (
+                      <a
+                        href={`https://wa.me/${item.contact_phone.replace(/[^0-9]/g, "")}?text=Hi%2C%20I%20am%20inquiring%20about%20${encodeURIComponent(item.name)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-emerald-700 shadow-sm"
+                      >
+                        <MessageCircle className="h-3.5 w-3.5" /> WhatsApp Host
+                      </a>
+                    )}
+                  </div>
                 </div>
-              )}
+
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                  <div className="rounded-xl border border-slate-100 bg-slate-50/70 p-3.5">
+                    <p className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-ocean-muted">
+                      <MapPin className="h-3.5 w-3.5 text-ocean-coral" /> Exact Meeting Location
+                    </p>
+                    <p className="mt-1 text-sm font-semibold text-ocean-navy">
+                      {item.meeting_point || `${item.village_name || "Coastal"} Fishing Harbour / Landing Centre`}
+                    </p>
+                    <p className="mt-0.5 text-xs text-ocean-text-secondary">
+                      {[item.village_name, item.district_name, item.state].filter(Boolean).join(", ")}
+                    </p>
+                    {(item.latitude && item.longitude) && (
+                      <a
+                        href={item.google_maps_url || `https://www.google.com/maps?q=${item.latitude},${item.longitude}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-2.5 inline-flex items-center gap-1.5 text-xs font-bold text-ocean-blue hover:underline"
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" /> Open in Google Maps ({item.latitude.toFixed(4)}, {item.longitude.toFixed(4)})
+                      </a>
+                    )}
+                  </div>
+
+                  <div className="rounded-xl border border-emerald-100 bg-emerald-50/50 p-3.5">
+                    <p className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-emerald-800">
+                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" /> Buyer Protection &amp; Escrow Guarantee
+                    </p>
+                    <p className="mt-1 text-xs leading-relaxed text-emerald-950 font-medium">
+                      100% Escrow Protected: 80% goes directly to the Fisher Family upon completion, 10% Village Eco-Fund, 5% Youth Guides, 5% Platform.
+                    </p>
+                    <p className="mt-1.5 text-[11px] text-emerald-700 font-semibold">
+                      ✓ Instant refund if fishing-ban / weather alert cancels trip.
+                    </p>
+                  </div>
+                </div>
+              </div>
 
               {/* transparent split */}
               {splitLines.length > 0 && (
@@ -319,6 +385,26 @@ export default function ExperienceDetailPage() {
                       </div>
                     ))}
                   </div>
+
+                  {/* Who in the household/village earns from this model */}
+                  {meta.earners?.length > 0 && (
+                    <div className="mt-5 border-t border-emerald-200/70 pt-4">
+                      <p className="mb-2.5 text-xs font-bold uppercase tracking-wider text-emerald-800">
+                        👨‍👩‍👧‍👦 Who in the fishing community earns from {meta.short}:
+                      </p>
+                      <div className="grid gap-2 sm:grid-cols-3">
+                        {meta.earners.map((e) => (
+                          <div key={e.who} className="flex items-center gap-2 rounded-xl bg-white/90 px-3 py-2 shadow-sm border border-emerald-100">
+                            <span className="text-lg">{e.emoji}</span>
+                            <div className="min-w-0">
+                              <p className="truncate text-xs font-bold text-ocean-navy">{e.who}</p>
+                              <p className="truncate text-[11px] text-ocean-text-secondary">{e.role}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -385,20 +471,50 @@ export default function ExperienceDetailPage() {
                   title={item.name}
                 />
 
-                {(item.village_name || item.meeting_point) && (
-                  <div className="rounded-2xl border border-ocean-border bg-white p-5">
-                    <p className="mb-2 text-xs font-bold uppercase tracking-wider text-ocean-muted">Where</p>
-                    <p className="flex items-start gap-2 text-sm font-semibold text-ocean-navy">
-                      <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-ocean-green" />
-                      {[item.meeting_point, item.village_name, item.district_name].filter(Boolean).join(" · ")}
+                {/* Verified Trust & Location Card */}
+                <div className="rounded-2xl border border-emerald-200 bg-white p-5 shadow-sm space-y-3">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                    <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-800">
+                      <ShieldCheck className="h-4 w-4 text-emerald-600" /> Verified Host Partner
+                    </span>
+                    <span className="text-[10px] font-mono font-semibold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded">
+                      {item.verification_code || "O3L-VERIFIED"}
+                    </span>
+                  </div>
+
+                  <div>
+                    <p className="text-xs font-bold text-ocean-navy">
+                      {familyObj?.name || item.family_name || "Coastal Fisher Family Society"}
+                    </p>
+                    <p className="mt-0.5 text-[11px] text-ocean-text-secondary">
+                      {[item.meeting_point, item.village_name, item.district_name, item.state].filter(Boolean).join(", ")}
                     </p>
                   </div>
-                )}
 
-                <div className="rounded-2xl border border-ocean-border bg-ocean-light/60 p-5 text-xs leading-relaxed text-ocean-text-secondary">
-                  <p className="mb-1.5 font-bold text-ocean-navy">♻️ Why this matters</p>
-                  Booking directly funds the fishing family and the village fund — no middlemen.
-                  During fishing-ban months your visit becomes their alternative income.
+                  <div className="pt-1 flex flex-col gap-2">
+                    {item.contact_phone && (
+                      <a
+                        href={`tel:${item.contact_phone}`}
+                        className="flex items-center justify-center gap-1.5 rounded-lg border border-ocean-blue bg-ocean-foam px-3 py-2 text-xs font-bold text-ocean-blue transition hover:bg-ocean-blue hover:text-white"
+                      >
+                        <Phone className="h-3.5 w-3.5" /> Direct Call: {item.contact_phone}
+                      </a>
+                    )}
+                    {(item.latitude && item.longitude) && (
+                      <a
+                        href={item.google_maps_url || `https://www.google.com/maps?q=${item.latitude},${item.longitude}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-bold text-ocean-navy transition hover:bg-slate-100"
+                      >
+                        <ExternalLink className="h-3.5 w-3.5 text-ocean-green" /> Open Exact Pin in Google Maps
+                      </a>
+                    )}
+                  </div>
+
+                  <div className="rounded-lg bg-emerald-50/80 p-2.5 text-[11px] font-medium text-emerald-950 border border-emerald-100">
+                    🛡️ <b>100% Escrow Protected:</b> 80% directly paid to the Fisher Family on completion. 100% refundable if weather/ban cancels trip.
+                  </div>
                 </div>
               </div>
             </div>

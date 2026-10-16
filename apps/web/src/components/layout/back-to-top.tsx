@@ -43,6 +43,7 @@ export function BackToTop() {
 
   return (
     <button
+      suppressHydrationWarning
       type="button"
       onClick={scrollToTop}
       aria-label="Back to top"

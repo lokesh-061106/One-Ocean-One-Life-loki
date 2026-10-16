@@ -54,7 +54,7 @@ export function Option3Nav() {
 
   return (
     <div className="border-t border-border/50 bg-white/95 backdrop-blur-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
         {/* Desktop tab bar */}
         <nav className="hidden lg:flex items-center gap-1" aria-label="Section tabs">
           {visibleTabs.map((tab) => {

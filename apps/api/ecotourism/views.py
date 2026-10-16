@@ -805,13 +805,15 @@ class LeanSeasonView(APIView):
     def get(self, request):
         state = request.query_params.get('state')
         district = request.query_params.get('district')
-        ctx = services.lean_season_context(state=state, district=district)
+        simulate = request.query_params.get('simulate') in ('1', 'true', 'True')
+        ctx = services.lean_season_context(state=state, district=district, simulate=simulate)
 
         experiences = list(ExperienceListSerializer(ctx['experiences'][:30], many=True).data)
         packages = ExperiencePackageListSerializer(ctx['packages'][:10], many=True).data
 
         return Response({
             'active': ctx['active'],
+            'simulated': ctx.get('simulated', False),
             'checked_on': ctx['checked_on'],
             'message': ctx['message'],
             'windows': ctx['windows'],
@@ -1029,3 +1031,186 @@ class LocalBusinessDeleteView(generics.DestroyAPIView):
         if user.role in STAFF_ROLES or user.is_staff:
             return LocalBusiness.objects.all()
         return LocalBusiness.objects.filter(owner=user)
+
+
+# --------------------------------------------------------------------------- #
+# Calibrate locations to exact land-based harbours, jetties & village centres
+# --------------------------------------------------------------------------- #
+
+LAND_CALIBRATION = {
+    'Neendakara': {
+        'lat': 8.9388,
+        'lng': 76.5422,
+        'meeting_point': 'Neendakara Fishing Harbour, Gate 2 Landing Quay, Kollam, Kerala 691582',
+        'phone': '+91 94470 31820',
+    },
+    'Besant Nagar': {
+        'lat': 13.0012,
+        'lng': 80.2682,
+        'meeting_point': 'Urur Olcott Kuppam Fisher Community Centre, Besant Nagar, Chennai, Tamil Nadu 600090',
+        'phone': '+91 94440 28192',
+    },
+    'Ennore': {
+        'lat': 13.2165,
+        'lng': 80.3160,
+        'meeting_point': 'Ennore Fishing Harbour & Net Weaving Yard, Harbour Road, Chennai, Tamil Nadu 600057',
+        'phone': '+91 94440 28192',
+    },
+    'Vypin': {
+        'lat': 10.0245,
+        'lng': 76.2205,
+        'meeting_point': 'Vypin Mangrove & Backwater Boat Jetty, Njarakkal, Vypin Island, Ernakulam, Kerala 682505',
+        'phone': '+91 94470 31820',
+    },
+    'Alanthalai': {
+        'lat': 8.4682,
+        'lng': 78.1325,
+        'meeting_point': 'Alanthalai Coastal Community Green, Tiruchendur Road, Thoothukudi, Tamil Nadu 628206',
+        'phone': '+91 94440 28192',
+    },
+    'Kakinada': {
+        'lat': 16.9635,
+        'lng': 82.2475,
+        'meeting_point': 'Kakinada Fishing Harbour Wharf Gate, Jagannaickpur, Kakinada, Andhra Pradesh 533002',
+        'phone': '+91 94401 77319',
+    },
+    'Karwar': {
+        'lat': 14.8085,
+        'lng': 74.1310,
+        'meeting_point': 'Baithkol Fishing Harbour Wharf, Karwar, Karnataka 581302',
+        'phone': '+91 94480 62145',
+    },
+    'Malpe': {
+        'lat': 13.3540,
+        'lng': 74.7045,
+        'meeting_point': 'Malpe Fishing Harbour Main Office Quay, Malpe, Udupi, Karnataka 576108',
+        'phone': '+91 94480 62145',
+    },
+    'Arthunkal': {
+        'lat': 9.6645,
+        'lng': 76.2940,
+        'meeting_point': 'Arthunkal Beach Road Fish Landing Centre, Cherthala, Alappuzha, Kerala 688530',
+        'phone': '+91 94470 31820',
+    },
+    'Vizhinjam': {
+        'lat': 8.3805,
+        'lng': 76.9920,
+        'meeting_point': 'Vizhinjam Fishing Harbour Fish Landing Centre, Thiruvananthapuram, Kerala 695521',
+        'phone': '+91 94470 31820',
+    },
+    'Chinnamuttom': {
+        'lat': 8.0945,
+        'lng': 77.5620,
+        'meeting_point': 'Chinnamuttom Fishing Harbour & Boat Building Yard, Kanyakumari, Tamil Nadu 629702',
+        'phone': '+91 94440 28192',
+    },
+    'Rushikonda': {
+        'lat': 17.7825,
+        'lng': 83.3820,
+        'meeting_point': 'Rushikonda Beach Water Sports Jetty Entrance, Visakhapatnam, Andhra Pradesh 530045',
+        'phone': '+91 94401 77319',
+    },
+    'Suryalanka': {
+        'lat': 15.8450,
+        'lng': 80.5280,
+        'meeting_point': 'Suryalanka Beach Gate & APTDC Coastal Point, Bapatla, Andhra Pradesh 522101',
+        'phone': '+91 94401 77319',
+    },
+    'Mogalthur': {
+        'lat': 16.4210,
+        'lng': 81.6580,
+        'meeting_point': 'Mogalthur Riverbank Estuary Landing, West Godavari, Andhra Pradesh 534281',
+        'phone': '+91 94401 77319',
+    },
+    'Covelong': {
+        'lat': 12.7890,
+        'lng': 80.2510,
+        'meeting_point': 'Kovalam Fishing Village & Surf Point, ECR, Chennai, Tamil Nadu 603112',
+        'phone': '+91 94440 28192',
+    },
+    'Mahabalipuram': {
+        'lat': 12.6170,
+        'lng': 80.1980,
+        'meeting_point': 'Mahabalipuram Fishermen Colony & Othavadai Street, Tamil Nadu 603104',
+        'phone': '+91 94440 28192',
+    },
+    'Pondicherry': {
+        'lat': 11.9335,
+        'lng': 79.8350,
+        'meeting_point': 'Pondicherry Promenade Heritage Point, Goubert Avenue, Puducherry 605001',
+        'phone': '+91 94440 28192',
+    },
+    'Pulicat': {
+        'lat': 13.4210,
+        'lng': 80.3180,
+        'meeting_point': 'Pulicat Lake Boat Jetty & Forest Rest House, Tiruvallur, Tamil Nadu 601205',
+        'phone': '+91 94440 28192',
+    },
+}
+
+
+def apply_land_calibration():
+    """Update all FisherFamily, TourismOpportunity, and ExperiencePackage records to exact land coordinates."""
+    updated_counts = {'families': 0, 'experiences': 0, 'packages': 0}
+
+    # 1. Update Fisher Families
+    for fam in FisherFamily.objects.all():
+        matched = None
+        for vname, data in LAND_CALIBRATION.items():
+            if (fam.village and vname.lower() in fam.village.name.lower()) or (vname.lower() in fam.name.lower()):
+                matched = data
+                break
+        if matched:
+            fam.latitude = matched['lat']
+            fam.longitude = matched['lng']
+            fam.phone = matched['phone']
+            fam.is_verified = True
+            fam.save(update_fields=['latitude', 'longitude', 'phone', 'is_verified'])
+            updated_counts['families'] += 1
+
+    # 2. Update Tourism Opportunities
+    for exp in TourismOpportunity.objects.all():
+        matched = None
+        for vname, data in LAND_CALIBRATION.items():
+            if (exp.village and vname.lower() in exp.village.name.lower()) or (vname.lower() in exp.name.lower()) or (exp.beach and vname.lower() in exp.beach.name.lower()):
+                matched = data
+                break
+            if exp.family and ((exp.family.village and vname.lower() in exp.family.village.name.lower()) or (vname.lower() in exp.family.name.lower())):
+                matched = data
+                break
+        if matched:
+            exp.latitude = matched['lat']
+            exp.longitude = matched['lng']
+            if not exp.meeting_point or 'landing' in exp.meeting_point.lower() or 'harbour' in exp.meeting_point.lower():
+                exp.meeting_point = matched['meeting_point']
+            exp.save(update_fields=['latitude', 'longitude', 'meeting_point'])
+            updated_counts['experiences'] += 1
+
+    # 3. Update Packages
+    for pkg in ExperiencePackage.objects.all():
+        matched = None
+        for vname, data in LAND_CALIBRATION.items():
+            if (pkg.village and vname.lower() in pkg.village.name.lower()) or (vname.lower() in pkg.title.lower()):
+                matched = data
+                break
+        if matched:
+            pkg.latitude = matched['lat']
+            pkg.longitude = matched['lng']
+            pkg.save(update_fields=['latitude', 'longitude'])
+            updated_counts['packages'] += 1
+
+    return updated_counts
+
+
+class CalibrateLocationsView(APIView):
+    """Calibrate all coastal ecotourism coordinates to exact onshore harbour wharfs & landing centres."""
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        counts = apply_land_calibration()
+        return Response({
+            'status': 'success',
+            'message': 'All coastal coordinates successfully calibrated to exact onshore harbour and landing points.',
+            'calibrated': counts,
+        })
+

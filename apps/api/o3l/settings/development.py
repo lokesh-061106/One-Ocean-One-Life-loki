@@ -26,8 +26,26 @@ DATABASES = {
 }
 
 if os.name == 'nt':
-    GDAL_LIBRARY_PATH = os.environ.get('GDAL_LIBRARY_PATH', r'I:\PostgreSQL\18\bin\libgdal-35.dll')
-    GEOS_LIBRARY_PATH = os.environ.get('GEOS_LIBRARY_PATH', r'I:\PostgreSQL\18\bin\libgeos_c.dll')
+    import glob
+    _pg_dirs = [
+        r'C:\Program Files\PostgreSQL\18\bin',
+        r'C:\Program Files\PostgreSQL\17\bin',
+        r'C:\PostgreSQL\18\bin',
+        r'C:\PostgreSQL\17\bin',
+        r'I:\PostgreSQL\18\bin',
+    ]
+    _default_gdal = r'C:\Program Files\PostgreSQL\18\bin\libgdal-35.dll'
+    _default_geos = r'C:\Program Files\PostgreSQL\18\bin\libgeos_c.dll'
+    for _d in _pg_dirs:
+        _g = glob.glob(os.path.join(_d, 'libgdal*.dll'))
+        _c = glob.glob(os.path.join(_d, 'libgeos_c*.dll'))
+        if _g and _c:
+            os.environ['PATH'] = _d + os.pathsep + os.environ.get('PATH', '')
+            _default_gdal = _g[0]
+            _default_geos = _c[0]
+            break
+    GDAL_LIBRARY_PATH = os.environ.get('GDAL_LIBRARY_PATH') or _default_gdal
+    GEOS_LIBRARY_PATH = os.environ.get('GEOS_LIBRARY_PATH') or _default_geos
 else:
     GDAL_LIBRARY_PATH = os.environ.get('GDAL_LIBRARY_PATH') or None
     GEOS_LIBRARY_PATH = os.environ.get('GEOS_LIBRARY_PATH') or None

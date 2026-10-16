@@ -330,7 +330,7 @@ export function Header() {
           />
         </div>
       ) : (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
 
         <div className="flex min-h-[80px] items-center justify-between">
 

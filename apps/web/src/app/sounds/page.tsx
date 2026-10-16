@@ -77,23 +77,33 @@ export default function SoundsPage() {
     <div className="min-h-screen bg-ocean-foam">
       <Header />
       <main>
-        <section className="bg-gradient-to-r from-purple-600 to-ocean-blue py-16">
-          <div className="max-w-7xl mx-auto px-4 text-center">
-            <Badge variant="secondary" className="mb-4 bg-white/20 text-white border-white/30">Citizen Science</Badge>
-            <h1 className="text-4xl font-bold text-white mb-4">Ocean Sounds</h1>
-            <p className="text-lg text-ocean-sand max-w-2xl mx-auto">
-              Explore the curated Ocean Sound Library and listen to marine acoustic data from Tamil Nadu coast.
+        <section className="relative overflow-hidden bg-[#04162e] text-white py-16 sm:py-20">
+          <div className="absolute inset-0 bg-gradient-to-r from-[#021020] via-[#071c36] to-[#0f345e]" />
+          <div className="pointer-events-none absolute inset-0 opacity-15 mix-blend-luminosity">
+            <img src="/shg/p1-banner-boats.webp" alt="" className="h-full w-full object-cover" />
+          </div>
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#021020] via-transparent to-[#021020]/75" />
+
+          <div className="relative mx-auto max-w-[1720px] px-4 sm:px-6 lg:px-8 xl:px-10 text-center">
+            <Badge variant="secondary" className="mb-4 bg-sky-950/80 text-amber-300 border-sky-400/40 font-bold tracking-wider uppercase text-xs">
+              Marine Bioacoustics (PAM)
+            </Badge>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4 drop-shadow-md">
+              Ocean Sounds &amp; Acoustics
+            </h1>
+            <p className="text-sm sm:text-base md:text-lg text-slate-100 max-w-2xl mx-auto font-medium">
+              Explore curated marine acoustic recordings, dolphin echolocations, whale moans, and citizen hydrophone data.
             </p>
           </div>
         </section>
 
-        <div className="max-w-7xl mx-auto px-4 py-12">
+        <div className="mx-auto max-w-[1720px] px-4 sm:px-6 lg:px-8 xl:px-10 py-12">
           <Tabs defaultValue="library">
-            <TabsList className="mb-6">
-              <TabsTrigger value="library" className="gap-2">
+            <TabsList className="mb-8 bg-white border border-slate-200 p-1 rounded-xl shadow-xs">
+              <TabsTrigger value="library" className="gap-2 rounded-lg font-bold text-xs">
                 <Waves className="h-4 w-4" /> Sound Library
               </TabsTrigger>
-              <TabsTrigger value="recordings" className="gap-2">
+              <TabsTrigger value="recordings" className="gap-2 rounded-lg font-bold text-xs">
                 <Mic className="h-4 w-4" /> Citizen Recordings
               </TabsTrigger>
             </TabsList>
@@ -103,7 +113,7 @@ export default function SoundsPage() {
             </TabsContent>
 
             <TabsContent value="recordings">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {sounds.map((sound) => {
                   const citizenName = sound.contributor_name || sound.contributor || "Anonymous citizen";
                   const place = [sound.village_name, sound.district_name].filter(Boolean).join(", ");
