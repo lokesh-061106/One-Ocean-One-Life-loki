@@ -64,6 +64,23 @@ function LoginForm() {
     }
   };
 
+  const handleQuickLogin = async (demoEmail: string, demoPass: string) => {
+    setEmail(demoEmail);
+    setPassword(demoPass);
+    setEmailError("");
+    setPasswordError("");
+    setServerError("");
+    setLoading(true);
+    const result = await login(demoEmail, demoPass);
+    setLoading(false);
+    if (result.ok) {
+      router.push(nextPath);
+      router.refresh();
+    } else {
+      setServerError(result.error || "Login failed. Please try again.");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-ocean-foam flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -127,6 +144,47 @@ function LoginForm() {
                 Don&apos;t have an account?{" "}
                 <Link href="/register" className="text-ocean-blue hover:underline font-medium">Join O3L</Link>
               </p>
+            </div>
+
+            <div className="mt-6 pt-6 border-t border-ocean-slate/20">
+              <p className="text-xs font-semibold text-ocean-text-secondary uppercase tracking-wider text-center mb-3">
+                Quick 1-Click Demo Login
+              </p>
+              <div className="grid grid-cols-3 gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={loading}
+                  onClick={() => handleQuickLogin("admin@o3l.org", "Password@123")}
+                  className="text-xs py-2 h-auto flex flex-col items-center justify-center border-ocean-navy/20 hover:bg-ocean-navy hover:text-white"
+                >
+                  <span className="font-bold">Admin</span>
+                  <span className="text-[10px] opacity-75">Full access</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={loading}
+                  onClick={() => handleQuickLogin("fisherman@o3l.org", "Password@123")}
+                  className="text-xs py-2 h-auto flex flex-col items-center justify-center border-ocean-blue/20 hover:bg-ocean-blue hover:text-white"
+                >
+                  <span className="font-bold">Fisherman</span>
+                  <span className="text-[10px] opacity-75">Catch reports</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={loading}
+                  onClick={() => handleQuickLogin("demo@o3l.org", "Password@123")}
+                  className="text-xs py-2 h-auto flex flex-col items-center justify-center border-ocean-teal/20 hover:bg-ocean-teal hover:text-white"
+                >
+                  <span className="font-bold">Member</span>
+                  <span className="text-[10px] opacity-75">Community</span>
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
