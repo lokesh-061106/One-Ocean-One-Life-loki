@@ -1,5 +1,7 @@
 # O3L - One Ocean One Life
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Flokesh-061106%2FOne-Ocean-One-Life-loki&root-directory=apps%2Fweb)
+
 A cross-platform ocean and coastal community platform connecting fishermen, coastal communities, researchers, NGOs, vendors, and government resources across Tamil Nadu's coastline.
 
 ## Features

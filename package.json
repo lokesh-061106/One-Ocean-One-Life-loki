@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "build": "npm --prefix apps/web run build",
+    "start": "npm --prefix apps/web start",
     "dev": "concurrently -n mobile,web -c cyan,magenta --kill-others \"npm --prefix apps/mobile start\" \"npm --prefix apps/web dev\"",
     "dev:mobile": "npm --prefix apps/mobile start",
     "dev:web": "npm --prefix apps/web dev"
