@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.gis import admin as gis_admin
 from django.db import models
 from django.utils.html import format_html
-from core.widgets import RichTextWidget
+from core.widgets import LocalOSMWidget, RichTextWidget
 from .models import Event, EventParticipant, EventDiary, CommunityPost
 
 
@@ -24,6 +24,7 @@ class EventDiaryInline(admin.StackedInline):
 
 @admin.register(Event)
 class EventAdmin(gis_admin.GISModelAdmin):
+    gis_widget = LocalOSMWidget
     list_display = ["title", "event_type_badge", "organizer_name", "start_date", "end_date", "max_participants", "participant_count", "is_published", "created_at"]
     list_filter = ["event_type", "is_published", "start_date"]
     search_fields = ["title", "description", "organizer__username"]

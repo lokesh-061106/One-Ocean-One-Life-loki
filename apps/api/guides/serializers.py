@@ -10,6 +10,9 @@ class GuideCategorySerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'name_tamil', 'slug', 'icon', 'description', 'parent', 'sort_order', 'species_count']
 
     def get_species_count(self, obj):
+        annotated = getattr(obj, 'verified_species_count', None)
+        if annotated is not None:
+            return annotated
         return obj.species.filter(is_verified=True).count()
 
 

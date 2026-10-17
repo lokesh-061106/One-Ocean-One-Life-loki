@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.gis import admin as gis_admin
 from django.db import models
 from django.utils.html import format_html
-from core.widgets import RichTextWidget
+from core.widgets import LocalOSMWidget, RichTextWidget
 from .models import GuideCategory, GuideSpecies
 
 
@@ -42,6 +42,7 @@ class GuideCategoryAdmin(admin.ModelAdmin):
 
 @admin.register(GuideSpecies)
 class GuideSpeciesAdmin(gis_admin.GISModelAdmin):
+    gis_widget = LocalOSMWidget
     list_display = ["common_name", "slug", "tamil_name", "scientific_name", "category", "conservation_status_badge", "typical_size", "is_verified", "has_image"]
     list_filter = ["category", "is_verified", "conservation_status"]
     search_fields = ["common_name", "slug", "tamil_name", "scientific_name", "description", "habitat"]

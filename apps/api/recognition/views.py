@@ -1,4 +1,5 @@
 import math
+import re
 
 from django.db.models import Count, Sum, Value
 from django.db.models.functions import Coalesce
@@ -373,10 +374,12 @@ class ContributorRecognitionView(APIView):
             )[:50].values(
                 'id', 'type', 'title', 'base_points', 'q_quality', 'v_verification',
                 'i_impact', 'final_score_points', 'verified_at', 'created_at',
+                'catalogue_type__catalogue_id',
             )
         )
         for c in contribs:
             c['type_display'] = dict(Contribution.TYPE_CHOICES).get(c['type'], c['type'])
+            c['catalogue_id'] = c.pop('catalogue_type__catalogue_id', None)
 
         return response.Response({
             'user': str(user.id),
@@ -488,6 +491,16 @@ class CatalogueView(APIView):
     """
     permission_classes = [permissions.AllowAny]
 
+    @staticmethod
+    def _eligibility(description):
+        """Workbook rows are stored as '[CT01] Clear photo + ... | Rs.100 | Marketplace'.
+
+        The middle segment is the Eligibility_Description column — return it
+        on its own so clients don't have to parse the composite string.
+        """
+        match = re.match(r'^\[[^\]]+\]\s*(.*?)\s*\|\s*Rs\.', description or '')
+        return match.group(1) if match else (description or '')
+
     def get(self, request):
         from contributions.models import ContributionType
 
@@ -497,6 +510,8 @@ class CatalogueView(APIView):
                 'catalogue_id': c.catalogue_id,
                 'name': c.name,
                 'slug': c.slug,
+                'description': c.description,
+                'eligibility_description': self._eligibility(c.description),
                 'base_points_b': float(c.base_points_b),
                 'fixed_price_inr': float(c.fixed_price_inr) if c.fixed_price_inr is not None else None,
                 'price_display': c.price_display,

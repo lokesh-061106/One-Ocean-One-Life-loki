@@ -55,26 +55,40 @@ class SightingCategorySpecies(BaseModel):
         return self.common_name
 
 
-class MarineSighting(BaseModel):
-    BEHAVIOR_CHOICES = [
-        ('traveling', 'Traveling'),
-        ('feeding', 'Feeding'),
-        ('resting', 'Resting'),
-        ('playing', 'Playing'),
-        ('breeding', 'Breeding'),
-        ('unknown', 'Unknown'),
-    ]
+class SightingBehavior(BaseModel):
+    """Dynamic list of sighting behaviours shown in the Marine Sighting admin.
 
+    Replaces the fixed ``BEHAVIOR_CHOICES`` dropdown: staff can add, rename,
+    reorder or deactivate behaviours from Sightings → Behaviors and they show
+    up immediately in the Marine Sighting form. The behaviour is stored on
+    ``MarineSighting.behavior`` as this row's slug.
+    """
+
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True)
+    description = models.TextField(blank=True)
+    sort_order = models.IntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "sighting_behaviors"
+        ordering = ["sort_order", "name"]
+
+    def __str__(self):
+        return self.name
+
+
+class MarineSighting(BaseModel):
     contribution = models.OneToOneField('contributions.Contribution', on_delete=models.CASCADE, related_name='marine_sighting')
     category = models.ForeignKey(SightingCategory, on_delete=models.SET_NULL, null=True, blank=True, related_name='sightings')
     species = models.ForeignKey('guides.GuideSpecies', on_delete=models.SET_NULL, null=True, blank=True)
     slug = models.SlugField(max_length=240, unique=True, blank=True)
     ai_species_suggestion = models.CharField(max_length=200, blank=True)
     ai_confidence = models.FloatField(null=True, blank=True)
-    photo = models.ImageField(upload_to='sightings/', blank=True, null=True)
-    video = models.FileField(upload_to='sightings/video/', blank=True, null=True)
+    photo = models.ImageField(upload_to='sightings/', max_length=255, blank=True, null=True)
+    video = models.FileField(upload_to='sightings/video/', max_length=255, blank=True, null=True)
     number_observed = models.IntegerField(default=1)
-    behavior = models.CharField(max_length=30, choices=BEHAVIOR_CHOICES, default='unknown')
+    behavior = models.CharField(max_length=30, default='unknown')
     sea_condition = models.CharField(max_length=100, blank=True)
     weather = models.CharField(max_length=100, blank=True)
     notes = models.TextField(blank=True)
@@ -117,7 +131,7 @@ class MarineSighting(BaseModel):
 
 class SightingImage(BaseModel):
     sighting = models.ForeignKey(MarineSighting, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='sightings/gallery/')
+    image = models.ImageField(upload_to='sightings/gallery/', max_length=255)
     caption = models.CharField(max_length=200, blank=True)
     sort_order = models.IntegerField(default=0)
 

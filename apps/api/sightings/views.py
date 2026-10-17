@@ -1,4 +1,5 @@
 from django.core.exceptions import ValidationError
+from django.db.models import Count
 from django.http import Http404
 from rest_framework import generics, permissions
 from .models import MarineSighting, SightingCategory
@@ -13,7 +14,12 @@ from .serializers import (
 class SightingCategoryListView(generics.ListAPIView):
     serializer_class = SightingCategorySerializer
     permission_classes = [permissions.AllowAny]
-    queryset = SightingCategory.objects.prefetch_related('species').all()
+    queryset = (
+        SightingCategory.objects
+        .annotate(sightings_count=Count('sightings'))
+        .filter(sightings_count__gt=0)
+        .prefetch_related('species')
+    )
 
 
 class MarineSightingListView(generics.ListAPIView):

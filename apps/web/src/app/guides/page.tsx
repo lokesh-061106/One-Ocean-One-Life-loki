@@ -48,7 +48,7 @@ function mapSpecies(api: ApiSpecies): Species {
   return {
     id: api.id,
     slug: api.slug || api.id,
-    category_id: cat?.id || "",
+    category_id: cat?.id || (typeof api.category === "string" ? api.category : ""),
     category_slug: cat?.slug || "",
     common_name: api.common_name,
     scientific_name: api.scientific_name,
@@ -75,13 +75,19 @@ export default function GuidesPage() {
         fetchCmsList<ApiGuideCategory>("/guides/categories/"),
       ]);
       if (apiSpecies.length > 0) {
+        const catSlugById = new Map(apiCats.map((c) => [c.id, c.slug]));
         const seen = new Set<string>();
         const unique = apiSpecies.filter((s) => {
           if (seen.has(s.id)) return false;
           seen.add(s.id);
           return true;
         });
-        setSpecies(unique.map(mapSpecies));
+        setSpecies(
+          unique.map((s) => {
+            const mapped = mapSpecies(s);
+            return { ...mapped, category_slug: mapped.category_slug || catSlugById.get(mapped.category_id) || "" };
+          })
+        );
       }
       if (apiCats.length > 0) setCategories(apiCats.map(mapCategory));
     }

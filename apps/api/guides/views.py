@@ -1,6 +1,6 @@
 import uuid
 
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.http import Http404
 from rest_framework import generics, permissions
 from .models import GuideCategory, GuideSpecies
@@ -10,7 +10,12 @@ from .serializers import GuideCategorySerializer, GuideSpeciesListSerializer, Gu
 class GuideCategoryListView(generics.ListAPIView):
     serializer_class = GuideCategorySerializer
     permission_classes = [permissions.AllowAny]
-    queryset = GuideCategory.objects.filter(parent__isnull=True)
+    queryset = (
+        GuideCategory.objects
+        .filter(parent__isnull=True, species__is_verified=True)
+        .annotate(verified_species_count=Count('species', filter=Q(species__is_verified=True)))
+        .distinct()
+    )
 
 
 class GuideSpeciesListView(generics.ListAPIView):

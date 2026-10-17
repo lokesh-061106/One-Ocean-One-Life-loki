@@ -9,12 +9,18 @@ class SightingCategorySpeciesSerializer(serializers.ModelSerializer):
 
 
 class SightingCategorySerializer(serializers.ModelSerializer):
-    sightings_count = serializers.IntegerField(source='sightings.count', read_only=True)
+    sightings_count = serializers.SerializerMethodField()
     species = SightingCategorySpeciesSerializer(many=True, read_only=True)
 
     class Meta:
         model = SightingCategory
         fields = ['id', 'name', 'slug', 'icon', 'description', 'sort_order', 'sightings_count', 'species']
+
+    def get_sightings_count(self, obj):
+        annotated = getattr(obj, 'sightings_count', None)
+        if annotated is not None:
+            return annotated
+        return obj.sightings.count()
 
 
 class SightingImageSerializer(serializers.ModelSerializer):

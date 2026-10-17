@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.gis import admin as gis_admin
+from core.widgets import LocalOSMWidget
 from .models import Zone, District, Village, StateFisheriesProfile, StateLeanPeriod
 
 
@@ -18,6 +19,7 @@ class VillageInline(admin.TabularInline):
 
 @admin.register(Zone)
 class ZoneAdmin(gis_admin.GISModelAdmin):
+    gis_widget = LocalOSMWidget
     list_display = ["zone_number", "name", "slug", "district_count", "description_short", "created_at"]
     prepopulated_fields = {"slug": ("name",)}
     search_fields = ["name", "description"]
@@ -37,6 +39,7 @@ class ZoneAdmin(gis_admin.GISModelAdmin):
 
 @admin.register(District)
 class DistrictAdmin(gis_admin.GISModelAdmin):
+    gis_widget = LocalOSMWidget
     list_display = ["name", "slug", "zone", "state", "population", "area_sq_km", "village_count"]
     list_filter = ["zone", "state"]
     prepopulated_fields = {"slug": ("name",)}
@@ -52,6 +55,7 @@ class DistrictAdmin(gis_admin.GISModelAdmin):
 
 @admin.register(Village)
 class VillageAdmin(gis_admin.GISModelAdmin):
+    gis_widget = LocalOSMWidget
     list_display = ["name", "slug", "district", "zone_name", "is_coastal", "population", "latitude", "longitude"]
     list_filter = ["is_coastal", "district__zone"]
     prepopulated_fields = {"slug": ("name",)}

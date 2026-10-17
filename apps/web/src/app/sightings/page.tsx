@@ -21,6 +21,7 @@ interface SightingCategory {
   name: string;
   slug: string;
   icon: string;
+  sightings_count?: number;
   species: { id: string; common_name: string; scientific_name: string; source_ref: string }[];
 }
 
@@ -110,7 +111,7 @@ export default function SightingsPage() {
               Community Biodiversity Log
             </Badge>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4 drop-shadow-md">
-              Marine Sightings
+              Marine Mammal Sightings
             </h1>
             <p className="text-sm sm:text-base md:text-lg text-slate-100 max-w-2xl mx-auto font-medium">
               Document and explore marine mammal, turtle, and marine life observations along Southern Indian coasts.
@@ -134,14 +135,28 @@ export default function SightingsPage() {
               <button
                 key={category.id}
                 onClick={() => setActiveCategory(category.id === activeCategory ? "" : category.id)}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-xs ${
+                className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all shadow-xs ${
                   activeCategory === category.id
                     ? "bg-ocean-navy text-white shadow-md scale-105"
                     : "bg-white text-ocean-text-secondary border border-slate-200 hover:border-ocean-blue hover:text-ocean-blue"
                 }`}
               >
-                {category.icon && <span className="mr-1">{category.icon}</span>}
-                {category.name}
+                {category.icon && (
+                  <span
+                    className="text-sm leading-none"
+                    style={{ fontFamily: '"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji","Android Emoji",sans-serif' }}
+                  >
+                    {category.icon}
+                  </span>
+                )}
+                <span>{category.name}</span>
+                {typeof category.sightings_count === "number" && (
+                  <span className={`inline-flex items-center justify-center rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
+                    activeCategory === category.id ? "bg-white/25 text-white" : "bg-ocean-foam text-ocean-navy"
+                  }`}>
+                    {category.sightings_count}
+                  </span>
+                )}
               </button>
             ))}
           </div>

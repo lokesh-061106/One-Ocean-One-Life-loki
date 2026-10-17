@@ -13,6 +13,7 @@ from django.utils.text import slugify
 
 from accounts.models import Profile
 from contributions.models import Contribution, ContributionType
+from contributions.scoring import MARKETPLACE_ELIGIBILITY_THRESHOLD
 from locations.models import CoastalRegion, District, Village, Zone
 from recognition.models import ContributionScore
 
@@ -146,7 +147,19 @@ class Command(BaseCommand):
                 self._import_connections(wb)
                 self._import_referrals(wb)
                 self._import_moderation_queue(wb)
-                self._import_awards(wb)
+                # The workbook leaderboard sheet carries lifetime aggregates that
+                # exceed the imported contribution rows (the Contributions sheet
+                # only holds a ~2-row sample per member). Close the gap with one
+                # clearly-labelled aggregate row per member so every lifetime
+                # total is itemised on the contributor page, then recompute
+                # scoreboards and rebuild awards from those totals.
+                from django.core.management import call_command
+
+                call_command('backfill_legacy_contributions')
+                from recognition.services import refresh_all_scores, regenerate_awards
+
+                refresh_all_scores()
+                regenerate_awards()
                 if self.dry_run:
                     transaction.set_rollback(True)
         except CommandError:
@@ -672,7 +685,7 @@ class Command(BaseCommand):
             score.data_items_sold = int(r.get("Data_Items_Sold") or 0)
             score.gross_sales_inr = float(r.get("Gross_Sales_INR") or 0)
             score.earnings_inr = float(r.get("Contributor_Earnings_INR") or 0)
-            score.marketplace_eligible = verified >= 25
+            score.marketplace_eligible = verified >= MARKETPLACE_ELIGIBILITY_THRESHOLD
             if member_contribs:
                 score.quality_average = round(
                     sum(q for _, q in member_contribs) / len(member_contribs), 3

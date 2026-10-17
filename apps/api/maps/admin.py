@@ -1,11 +1,13 @@
 from django.contrib import admin
 from django.contrib.gis import admin as gis_admin
 from django.utils.html import format_html
+from core.widgets import LocalOSMWidget
 from .models import OceanHotspot, EmergencyContact
 
 
 @admin.register(OceanHotspot)
 class OceanHotspotAdmin(gis_admin.GISModelAdmin):
+    gis_widget = LocalOSMWidget
     list_display = ["cell_id", "zone_name", "density_badge", "contribution_count", "quality_score", "last_calculated"]
     list_filter = ["density_level", "zone"]
     search_fields = ["cell_id"]
@@ -29,6 +31,7 @@ class OceanHotspotAdmin(gis_admin.GISModelAdmin):
 
 @admin.register(EmergencyContact)
 class EmergencyContactAdmin(gis_admin.GISModelAdmin):
+    gis_widget = LocalOSMWidget
     list_display = ["name", "contact_type_badge", "phone", "phone_secondary", "village_name", "district_name", "is_active", "created_at"]
     list_filter = ["contact_type", "is_active", "district"]
     search_fields = ["name", "phone", "phone_secondary", "address"]

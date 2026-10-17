@@ -66,6 +66,7 @@ interface ContributionRow {
   id: string;
   type: string;
   type_display: string;
+  catalogue_id: string | null;
   title: string;
   base_points: number;
   q_quality: number;
@@ -217,6 +218,7 @@ export default function ContributorRecognitionPage() {
   const heldKeys = new Set(data.badges || []);
   const heldBadges = (data.badge_info || []).filter((b) => heldKeys.has(b.key));
   const earnedPoints = (data.contributions || []).reduce((s, c) => s + (c.final_score_points || 0), 0);
+  const listComplete = earnedPoints + 0.5 >= (data.total_score || 0);
 
   return (
     <div className="min-h-screen bg-ocean-foam">
@@ -382,7 +384,7 @@ export default function ContributorRecognitionPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Calculator className="h-5 w-5 text-ocean-blue" />
-                    Verified contributions behind this score
+                    Verified contribution records
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -390,7 +392,9 @@ export default function ContributorRecognitionPage() {
                     <>
                       <p className="text-xs text-ocean-text-secondary">
                         Each verified record scores <b className="text-ocean-navy">B × Q × V × I</b>. Sorted by points
-                        contributed — these are the entries that produced the {fmt(data.total_score)} total.
+                        contributed — {listComplete
+                          ? 'these are the verified entries that produced the total.'
+                          : 'below is the imported sample of their records, and their full verified history makes up the lifetime total.'}
                       </p>
                       <div className="space-y-2">
                         {data.contributions.map((c) => (
@@ -440,10 +444,14 @@ export default function ContributorRecognitionPage() {
                       </div>
                       <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-ocean-light/60 px-3 py-2 text-xs">
                         <span className="text-ocean-text-secondary">
-                          {data.contributions_shown} of {fmt(data.verified_contributions)} verified shown
+                          {listComplete
+                            ? 'All verified records listed'
+                            : `${data.contributions_shown} of ${fmt(data.verified_contributions)} verified records listed`}
                         </span>
                         <span className="font-bold text-ocean-navy">
-                          {fmt(earnedPoints)} pts from listed records
+                          {listComplete
+                            ? `${fmt(data.total_score)} lifetime total`
+                            : `${fmt(earnedPoints)} pts from listed records · ${fmt(data.total_score)} lifetime total`}
                         </span>
                       </div>
                     </>

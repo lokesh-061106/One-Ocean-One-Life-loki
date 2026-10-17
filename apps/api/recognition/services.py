@@ -47,19 +47,15 @@ DEFAULT_BADGES = [
 
 
 def ensure_tiers():
-    """Create the default tier ladder if missing (idempotent)."""
-    existing = set(TierThreshold.objects.values_list('key', flat=True))
+    """Create or update the default tier ladder (idempotent)."""
     for t in DEFAULT_TIERS:
-        if t['key'] not in existing:
-            TierThreshold.objects.create(**t)
+        TierThreshold.objects.update_or_create(key=t['key'], defaults=t)
     return TierThreshold.objects.all()
 
 
 def ensure_badges():
-    existing = set(BadgeDefinition.objects.values_list('key', flat=True))
     for b in DEFAULT_BADGES:
-        if b['key'] not in existing:
-            BadgeDefinition.objects.create(**b)
+        BadgeDefinition.objects.update_or_create(key=b['key'], defaults=b)
     return BadgeDefinition.objects.all()
 
 
@@ -114,10 +110,16 @@ def refresh_user_score(user):
         state = ''
     region = village.region if village else None
 
-    # Seeded lifetime figures (written by import_contributor_db) act as a floor,
-    # because a workbook member's verified count can exceed their imported rows.
+    # Workbook lifetime records (written by import_contributor_db into
+    # profile.metadata['leaderboard']) are the authoritative totals for
+    # imported members — the Contributions sheet only holds a ~2-row sample
+    # per member. Floor points, counts and earnings at those figures so a
+    # refresh can never collapse a member's real record to the sample sum.
     seed = (profile.metadata or {}).get('leaderboard') if profile else None
     if seed:
+        seed_points = float(seed.get('total_score_points') or 0)
+        if seed_points > float(points):
+            points = seed_points
         verified = max(verified, int(seed.get('verified_contributions') or 0))
         total = max(total, verified)
 
@@ -264,3 +266,65 @@ def refresh_all_scores(user_ids=None):
         except Exception as exc:  # noqa: BLE001 — keep the bulk job alive
             print(f"score refresh failed for {user.username}: {exc}")
     return updated
+
+
+def regenerate_awards(year=None):
+    """Rebuild RecognitionAward rows from the current scoreboard.
+
+    Top 3 per state (rank 1 Data Contributor, ranks 2–3 Community Champion)
+    plus a Marketplace Eligible award for every member past the gate.
+    Replaces all existing awards for the year.
+    """
+    from collections import defaultdict
+
+    from django.utils import timezone
+
+    from .models import RecognitionAward
+
+    year = year or timezone.now().year
+    RecognitionAward.objects.filter(year=year).delete()
+
+    by_state = defaultdict(list)
+    for s in ContributionScore.objects.select_related('user').filter(state__gt=''):
+        by_state[s.state].append(s)
+
+    created = 0
+    for state, rows in by_state.items():
+        rows.sort(key=lambda x: (-x.total_score, -x.verified_contributions, x.user.username))
+        for position, score in enumerate(rows[:3], start=1):
+            RecognitionAward.objects.create(
+                user=score.user,
+                category='data_contributor' if position == 1 else 'community_champion',
+                year=year,
+                title=f"{state} Rank #{position} Contributor {year}",
+                description=(
+                    f"Ranked #{position} in {state} with "
+                    f"{score.total_score} score points and "
+                    f"{score.verified_contributions} verified contributions."
+                ),
+                village=getattr(getattr(score.user, 'profile', None), 'village', None),
+                score=score.total_score,
+                rank=position,
+            )
+            created += 1
+
+    for score in ContributionScore.objects.select_related('user').filter(
+        marketplace_eligible=True,
+    ):
+        RecognitionAward.objects.get_or_create(
+            user=score.user,
+            title=f"Marketplace Eligible Contributor {year}",
+            defaults={
+                'category': 'marine_guardian',
+                'year': year,
+                'description': (
+                    f'Cleared the {MARKETPLACE_ELIGIBILITY_THRESHOLD} verified contribution gate — '
+                    'their data can be licensed on the O3L marketplace.'
+                ),
+                'village': getattr(getattr(score.user, 'profile', None), 'village', None),
+                'score': score.total_score,
+            },
+        )
+        created += 1
+
+    return created

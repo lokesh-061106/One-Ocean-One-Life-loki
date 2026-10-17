@@ -4,7 +4,7 @@ from django.db import models
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import path, reverse
 from django.utils.html import format_html
-from core.widgets import RichTextWidget
+from core.widgets import LocalOSMWidget, RichTextWidget
 from .models import Contribution, ContributionMedia, ContributionType, PendingContribution
 from .publishing import publish_contribution, unpublish_contribution, withdraw_contribution
 
@@ -27,6 +27,7 @@ class ContributionTypeAdmin(admin.ModelAdmin):
 
 @admin.register(Contribution)
 class ContributionAdmin(gis_admin.GISModelAdmin):
+    gis_widget = LocalOSMWidget
     list_display = ["user_name", "title", "type_badge", "status_badge", "quality_score", "points", "village_name", "submitted_at", "created_at"]
     list_filter = ["type", "status", "safety_status", "moderation_decision", "visibility_status", "location_precision", "created_at"]
     search_fields = ["user__username", "user__email", "title", "author", "notes"]
@@ -151,6 +152,7 @@ class ContributionMediaAdmin(admin.ModelAdmin):
 class PendingReviewAdmin(gis_admin.GISModelAdmin):
     """Review queue: only contributions awaiting a decision, with Approve/Reject."""
 
+    gis_widget = LocalOSMWidget
     list_display = ["title_or_notes", "type_badge", "destination_module", "author_name", "village_name", "status_badge", "safety_status", "submitted_at", "actions_column"]
     list_filter = ["type", "safety_status", "submitted_at"]
     search_fields = ["user__username", "user__email", "title", "author", "notes"]
