@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   AudioLines, BookOpen, Calendar, ChevronLeft, ChevronRight,
-  Eye, Fish, ImagePlus, Layers, LocateFixed, MapPin, Save, Scroll,
+  Eye, Fish, ImagePlus, ImageUp, Layers, LocateFixed, MapPin, Save, Scroll,
   Search, Trash2, Upload, X, AlertCircle, CheckCircle2,
 } from "lucide-react";
+import { gps } from "exifr";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -114,6 +115,9 @@ export function ContributionWizard({
   const [saving, setSaving] = useState(false);
   const [locating, setLocating] = useState(false);
   const [locError, setLocError] = useState<string | null>(null);
+  const [readingGps, setReadingGps] = useState(false);
+  const [gpsPhotoMsg, setGpsPhotoMsg] = useState<string | null>(null);
+  const gpsPhotoInputRef = useRef<HTMLInputElement>(null);
   const [researchOpen, setResearchOpen] = useState(false);
   const [showOtherTypes, setShowOtherTypes] = useState(false);
 
@@ -251,6 +255,7 @@ export function ContributionWizard({
 
   const locate = () => {
     setLocError(null);
+    setGpsPhotoMsg(null);
     if (!navigator.geolocation) {
       setLocError("Geolocation is not supported in this browser. Enter coordinates manually.");
       return;
@@ -268,6 +273,32 @@ export function ContributionWizard({
       },
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 30000 },
     );
+  };
+
+  const handleGpsPhoto = async (file: File | null) => {
+    if (!file) return;
+    setLocError(null);
+    setGpsPhotoMsg(null);
+    setReadingGps(true);
+    try {
+      const coords = await gps(file);
+      if (coords && coords.latitude != null && coords.longitude != null) {
+        setLatitude(Number(coords.latitude.toFixed(6)));
+        setLongitude(Number(coords.longitude.toFixed(6)));
+        setGpsPhotoMsg("GPS coordinates read from the photo.");
+      } else {
+        setLocError(
+          "No GPS data found in this photo. Turn on Location when taking the photo, or enter the coordinates manually.",
+        );
+      }
+    } catch {
+      setLocError(
+        "Could not read GPS data from this photo. Try another photo or enter the coordinates manually.",
+      );
+    } finally {
+      setReadingGps(false);
+      if (gpsPhotoInputRef.current) gpsPhotoInputRef.current.value = "";
+    }
   };
 
   const validateStep = useCallback((index: number): boolean => {
@@ -631,10 +662,37 @@ export function ContributionWizard({
                     <AlertCircle className="h-3 w-3" />{locError}
                   </p>
                 )}
-                <Button type="button" variant="outline" onClick={locate} disabled={locating}>
-                  <LocateFixed className="h-4 w-4 mr-2" />
-                  {locating ? "Locating…" : "Use my current location"}
-                </Button>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button type="button" variant="outline" onClick={locate} disabled={locating}>
+                    <LocateFixed className="h-4 w-4 mr-2" />
+                    {locating ? "Locating…" : "Use my current location"}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => gpsPhotoInputRef.current?.click()}
+                    disabled={readingGps}
+                  >
+                    <ImageUp className="h-4 w-4 mr-2" />
+                    {readingGps ? "Reading…" : "Upload GPS photo"}
+                  </Button>
+                  <input
+                    ref={gpsPhotoInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
+                    className="hidden"
+                    onChange={(e) => handleGpsPhoto(e.target.files?.[0] ?? null)}
+                  />
+                </div>
+                <p className="text-[11px] text-ocean-text-secondary">
+                  Tip: turn on Location when taking the photo so it saves GPS coordinates. The photo is only
+                  used to read the location and is not uploaded.
+                </p>
+                {gpsPhotoMsg && (
+                  <p className="text-xs text-ocean-green flex items-center gap-1">
+                    <CheckCircle2 className="h-3 w-3" />{gpsPhotoMsg}
+                  </p>
+                )}
                 <div className="grid grid-cols-2 gap-4 max-w-md">
                   <div>
                     <Label className="text-sm font-medium text-ocean-navy mb-1.5 block">Latitude</Label>
