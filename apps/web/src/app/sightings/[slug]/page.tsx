@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { PageHero } from "@/components/layout/page-hero";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -156,7 +157,7 @@ export default function SightingDetailPage({ params }: { params: Promise<{ slug:
       <Header />
       <main>
         {/* Hero */}
-        <section className="bg-gradient-to-r from-ocean-coral to-ocean-blue py-12">
+        <PageHero bare className="py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <Link
               href="/sightings"
@@ -197,7 +198,7 @@ export default function SightingDetailPage({ params }: { params: Promise<{ slug:
               )}
             </div>
           </div>
-        </section>
+        </PageHero>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { PageHero } from "@/components/layout/page-hero";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ImageLightbox, type LightboxImage } from "@/components/ui/image-lightbox";
@@ -263,7 +264,7 @@ export default function CleanupDetailPage() {
     <div className="min-h-screen bg-ocean-foam">
       <Header />
       <main>
-        <section className="bg-gradient-to-r from-ocean-green to-ocean-deep py-12">
+        <PageHero bare className="py-12">
           <div className="max-w-5xl mx-auto px-4">
             <Link
               href="/cleanups"
@@ -296,7 +297,7 @@ export default function CleanupDetailPage() {
               )}
             </div>
           </div>
-        </section>
+        </PageHero>
 
         <div className="max-w-5xl mx-auto px-4 py-12">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

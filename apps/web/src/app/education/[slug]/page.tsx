@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, User, Calendar, Clock, Eye, Heart, Share2, BookOpen, Tag, ZoomIn } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { PageHero } from "@/components/layout/page-hero";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -100,7 +101,7 @@ export default function EducationPostPage({ params }: { params: Promise<{ slug: 
     <div className="min-h-screen bg-ocean-foam">
       <Header />
       <main>
-        <section className="bg-gradient-to-r from-ocean-deep to-ocean-blue py-12">
+        <PageHero bare className="py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <Link href="/education" className="inline-flex items-center gap-2 text-ocean-sand hover:text-white mb-6 transition-colors">
               <ArrowLeft className="h-4 w-4" />
@@ -123,7 +124,7 @@ export default function EducationPostPage({ params }: { params: Promise<{ slug: 
               <div className="flex items-center gap-1"><Clock className="h-4 w-4" />{readTime}</div>
             </div>
           </div>
-        </section>
+        </PageHero>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

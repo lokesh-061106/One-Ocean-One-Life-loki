@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { PageHero } from "@/components/layout/page-hero";
 import { Button } from "@/components/ui/button";
 import { fetchCms, fetchCmsList } from "@/lib/api-helpers";
 import { useRevealAll } from "@/hooks/use-reveal";
@@ -101,7 +102,7 @@ export default function PackageDetailPage() {
         </div>
 
         {/* hero */}
-        <section className={`reveal visible relative overflow-hidden bg-gradient-to-br ${meta.gradient} text-white`}>
+        <PageHero bare className="py-0 sm:py-0">
           <div className="absolute -right-10 -top-10 text-[200px] leading-none opacity-10 select-none">
             {meta.icon}
           </div>
@@ -141,7 +142,7 @@ export default function PackageDetailPage() {
               )}
             </div>
           </div>
-        </section>
+        </PageHero>
 
         <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
           <div className="grid gap-8 lg:grid-cols-3">

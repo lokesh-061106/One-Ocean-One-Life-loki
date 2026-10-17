@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { PageHero } from "@/components/layout/page-hero";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SkeletonList } from "@/components/ui/ocean-components";
@@ -225,12 +226,7 @@ export default function ContributorRecognitionPage() {
       <Header />
 
       <main>
-        <section className="relative overflow-hidden bg-gradient-to-br from-ocean-navy via-ocean-blue to-cyan-600 pb-28 pt-14">
-          <div className="pointer-events-none absolute inset-0 opacity-30">
-            <div className="absolute -left-20 top-8 h-64 w-64 rounded-full bg-white/20 blur-3xl animate-float" />
-            <div className="absolute right-10 top-20 h-40 w-40 rounded-full bg-cyan-300/30 blur-2xl animate-float" style={{ animationDelay: "1.2s" }} />
-          </div>
-
+        <PageHero bare className="pb-28 pt-14">
           <div className="relative mx-auto max-w-6xl px-4">
             <Link
               href="/recognition"
@@ -271,7 +267,7 @@ export default function ContributorRecognitionPage() {
               </div>
             </div>
           </div>
-        </section>
+        </PageHero>
 
         <div className="relative z-10 mx-auto -mt-14 max-w-6xl space-y-6 px-4 pb-16">
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">

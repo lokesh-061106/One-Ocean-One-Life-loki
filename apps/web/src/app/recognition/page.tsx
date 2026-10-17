@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { PageHero } from "@/components/layout/page-hero";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -708,14 +709,7 @@ export default function RecognitionPage() {
 
       <main>
         {/* ---------------- hero ---------------- */}
-        <section className="relative overflow-hidden bg-[#041c33] text-white pb-28 pt-16 border-b border-sky-900/40">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#021120] via-[#052647] to-[#073a66] opacity-90 pointer-events-none" />
-          <div className="pointer-events-none absolute inset-0 opacity-30">
-            <div className="absolute -left-20 top-10 h-64 w-64 rounded-full bg-sky-400/20 blur-3xl" />
-            <div className="absolute right-10 top-24 h-40 w-40 rounded-full bg-cyan-300/30 blur-2xl" />
-            <div className="absolute left-1/3 bottom-10 h-52 w-52 rounded-full bg-emerald-400/20 blur-3xl" />
-          </div>
-
+        <PageHero bare className="pt-16 pb-28">
           <div className="relative mx-auto max-w-[1720px] px-4 sm:px-6 lg:px-8 xl:px-10 text-center">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sky-400/15 text-sky-200 border border-sky-400/30 mb-5 tracking-wide uppercase">
               <Sparkles className="h-3.5 w-3.5" /> Recognition &amp; Scoreboard
@@ -760,7 +754,7 @@ export default function RecognitionPage() {
               d="M0,64 C240,120 480,0 720,32 C960,64 1200,128 1440,72 L1440,120 L0,120 Z"
             />
           </svg>
-        </section>
+        </PageHero>
 
         {/* ---------------- marketplace gate + my score ---------------- */}
         <section className="relative z-10 mx-auto -mt-12 max-w-[1720px] px-4 sm:px-6 lg:px-8 xl:px-10 pb-4">

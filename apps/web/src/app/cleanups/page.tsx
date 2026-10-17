@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Trash2, Users, Scale, User, Plus } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { PageHero } from "@/components/layout/page-hero";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -34,22 +35,12 @@ export default function CleanupsPage() {
     <div className="min-h-screen bg-ocean-foam">
       <Header />
       <main>
-        <section className="relative overflow-hidden bg-[#041c33] text-white py-14 sm:py-18 border-b border-sky-900/40">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#021120] via-[#052647] to-[#073a66] opacity-90 pointer-events-none" />
-          <div className="absolute -top-32 -right-32 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-32 -left-32 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="relative max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 text-center">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-400/15 text-emerald-200 border border-emerald-400/30 mb-4 tracking-wide uppercase">
-              Community Action
-            </span>
-            <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight mb-3">
-              Beach &amp; Coastal Clean-ups
-            </h1>
-            <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed">
-              Verified community cleanup drives recorded along India&apos;s coastline. Track volunteer participation and circular marine debris recovery.
-            </p>
-          </div>
-        </section>
+        <PageHero
+          width="wide"
+          badge={<span className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-400/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-200">Community Action</span>}
+          title="Beach & Coastal Clean-ups"
+          subtitle="Verified community cleanup drives recorded along India's coastline. Track volunteer participation and circular marine debris recovery."
+        />
 
         {!loading && cleanups.length > 0 && (
           <div className="max-w-[1720px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 pt-10">

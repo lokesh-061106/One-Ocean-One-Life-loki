@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Mic, Calendar, Waves, Plus } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { PageHero } from "@/components/layout/page-hero";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -77,25 +78,12 @@ export default function SoundsPage() {
     <div className="min-h-screen bg-ocean-foam">
       <Header />
       <main>
-        <section className="relative overflow-hidden bg-[#04162e] text-white py-16 sm:py-20">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#021020] via-[#071c36] to-[#0f345e]" />
-          <div className="pointer-events-none absolute inset-0 opacity-15 mix-blend-luminosity">
-            <img src="/shg/p1-banner-boats.webp" alt="" className="h-full w-full object-cover" />
-          </div>
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#021020] via-transparent to-[#021020]/75" />
-
-          <div className="relative mx-auto max-w-[1720px] px-4 sm:px-6 lg:px-8 xl:px-10 text-center">
-            <Badge variant="secondary" className="mb-4 bg-sky-950/80 text-amber-300 border-sky-400/40 font-bold tracking-wider uppercase text-xs">
-              Marine Bioacoustics (PAM)
-            </Badge>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4 drop-shadow-md">
-              Ocean Sounds &amp; Acoustics
-            </h1>
-            <p className="text-sm sm:text-base md:text-lg text-slate-100 max-w-2xl mx-auto font-medium">
-              Explore curated marine acoustic recordings, dolphin echolocations, whale moans, and citizen hydrophone data.
-            </p>
-          </div>
-        </section>
+        <PageHero
+          width="wide"
+          badge={<Badge variant="secondary" className="mb-4 bg-sky-950/80 text-amber-300 border-sky-400/40 font-bold tracking-wider uppercase text-xs">Marine Bioacoustics (PAM)</Badge>}
+          title="Ocean Sounds & Acoustics"
+          subtitle="Explore curated marine acoustic recordings, dolphin echolocations, whale moans, and citizen hydrophone data."
+        />
 
         <div className="mx-auto max-w-[1720px] px-4 sm:px-6 lg:px-8 xl:px-10 py-12">
           <Tabs defaultValue="library">

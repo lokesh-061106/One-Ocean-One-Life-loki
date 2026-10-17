@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { Phone, Star, Package } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { PageHero } from "@/components/layout/page-hero";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { fetchCms, fetchCmsList } from "@/lib/api-helpers";
@@ -58,7 +59,7 @@ export default function VendorProfilePage() {
     <div className="min-h-screen bg-ocean-foam">
       <Header />
       <main>
-        <section className="bg-gradient-to-r from-ocean-deep to-ocean-blue py-16">
+        <PageHero bare className="py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center gap-4 mb-4">
               <h1 className="text-4xl font-bold text-white">{vendor.shop_name}</h1>
@@ -93,7 +94,7 @@ export default function VendorProfilePage() {
               </div>
             </div>
           </div>
-        </section>
+        </PageHero>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <h2 className="text-2xl font-bold text-ocean-navy mb-8">Products by {vendor.shop_name}</h2>

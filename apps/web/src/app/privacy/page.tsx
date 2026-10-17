@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Database, Eye, Users, Lock, Globe, Shield } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { PageHero } from "@/components/layout/page-hero";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
@@ -35,13 +36,11 @@ export default function PrivacyPage() {
     <div className="min-h-screen bg-ocean-foam">
       <Header />
       <main>
-        <section className="bg-gradient-to-r from-ocean-deep to-ocean-blue py-20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <Badge variant="secondary" className="mb-4 bg-white/20 text-white border-white/30">Legal</Badge>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">{cms?.hero_title || "Privacy Policy"}</h1>
-            <p className="text-xl text-ocean-sand max-w-3xl mx-auto">{cms?.hero_subtitle || "Your privacy is fundamental to our mission."}</p>
-          </div>
-        </section>
+        <PageHero
+          badge={<Badge variant="secondary" className="mb-4 bg-white/20 text-white border-white/30">Legal</Badge>}
+          title={cms?.hero_title || "Privacy Policy"}
+          subtitle={cms?.hero_subtitle || "Your privacy is fundamental to our mission."}
+        />
 
         <section className="py-20">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">

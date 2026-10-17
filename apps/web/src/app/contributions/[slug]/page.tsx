@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { ArrowLeft, Award, Calendar, MapPin, User, FileText, Download } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { PageHero } from "@/components/layout/page-hero";
 import { Badge } from "@/components/ui/badge";
 import { RichContent } from "@/components/ui/rich-content";
 import { getPublicContribution } from "@/features/contributions";
@@ -65,7 +66,7 @@ export default function ContributionDetailPage() {
     <div className="min-h-screen bg-ocean-foam">
       <Header />
       <main>
-        <div className="bg-ocean-navy text-white">
+        <PageHero bare className="py-0 sm:py-0">
           <div className="max-w-4xl mx-auto px-4 py-8">
             <Link href="/contributions" className="inline-flex items-center gap-1.5 text-white/80 hover:text-white text-sm mb-4">
               <ArrowLeft className="h-4 w-4" />Back to Contributions
@@ -88,7 +89,7 @@ export default function ContributionDetailPage() {
               )}
             </div>
           </div>
-        </div>
+        </PageHero>
 
         <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
           {images.length > 0 && (

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Users, Globe, Heart, Shield, Target, Eye, MapPin, Award, ChevronRight, ArrowRight } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { PageHero } from "@/components/layout/page-hero";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -54,17 +55,17 @@ export default function AboutPage() {
       <Header />
       <main>
         {/* Hero */}
-        <section className="bg-gradient-to-r from-ocean-deep to-ocean-blue py-20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <Badge variant="secondary" className="mb-4 bg-white/20 text-white border-white/30">About O3L</Badge>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">{cms?.hero_title || "One Ocean One Life"}</h1>
-            <p className="text-xl text-ocean-sand max-w-3xl mx-auto mb-8">{cms?.hero_subtitle || "Connecting coastal communities to collectively understand and protect the ocean."}</p>
-            <div className="flex gap-4 justify-center">
-              <Button size="lg" className="bg-ocean-green hover:bg-ocean-green/90 text-white" asChild><Link href="/register">Join Our Mission <ArrowRight className="ml-2 h-5 w-5" /></Link></Button>
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-ocean-deep" asChild><Link href="/contact">Contact Us</Link></Button>
-            </div>
+        <PageHero
+          badge={<Badge variant="secondary" className="mb-4 bg-white/20 text-white border-white/30">About O3L</Badge>}
+          title={cms?.hero_title || "One Ocean One Life"}
+          subtitle={cms?.hero_subtitle || "Connecting coastal communities to collectively understand and protect the ocean."}
+          subtitleClassName="mb-8"
+        >
+          <div className="flex gap-4 justify-center">
+            <Button size="lg" className="bg-ocean-green hover:bg-ocean-green/90 text-white" asChild><Link href="/register">Join Our Mission <ArrowRight className="ml-2 h-5 w-5" /></Link></Button>
+            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-ocean-deep" asChild><Link href="/contact">Contact Us</Link></Button>
           </div>
-        </section>
+        </PageHero>
 
         {/* Mission / CMS Content */}
         <section className="py-20">

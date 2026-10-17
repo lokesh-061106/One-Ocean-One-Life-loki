@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, Calendar, MapPin, Users, Clock, User, Share2, CheckCircle, X, AlertCircle, Info } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { PageHero } from "@/components/layout/page-hero";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -188,7 +189,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
     <div className="min-h-screen bg-ocean-foam">
       <Header />
       <main>
-        <section className="bg-gradient-to-r from-ocean-deep to-ocean-blue py-12">
+        <PageHero bare className="py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <Link href="/events" className="inline-flex items-center gap-2 text-ocean-sand hover:text-white mb-6 transition-colors">
               <ArrowLeft className="h-4 w-4" />
@@ -200,7 +201,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">{event.title}</h1>
             <RichContent content={event.description} className="text-lg text-ocean-sand max-w-3xl on-dark" />
           </div>
-        </section>
+        </PageHero>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

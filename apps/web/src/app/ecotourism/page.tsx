@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { PageHero } from "@/components/layout/page-hero";
 import { Button } from "@/components/ui/button";
 import { fetchCms, fetchCmsList } from "@/lib/api-helpers";
 import { cn } from "@/lib/utils";
@@ -452,24 +453,7 @@ export default function EcotourismPage() {
 
       <main className="w-full">
         {/* ================= 1. EXECUTIVE FULL-SCREEN HERO BANNER ================= */}
-        <section className="relative w-full overflow-hidden bg-[#041c33] text-white">
-          {/* Deep Navy Gradient Base Layer */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#021120] via-[#052647] to-[#073a66]" />
-          
-          {/* Background image with low opacity */}
-          <div className="pointer-events-none absolute inset-0 opacity-20 mix-blend-luminosity">
-            <img
-              src="/shg/p1-banner-boats.webp"
-              alt=""
-              className="h-full w-full object-cover"
-            />
-          </div>
-
-          {/* Dark gradient wash to guarantee high contrast */}
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#021120] via-transparent to-[#021120]/75" />
-
-          {/* Subtle ocean grid pattern overlay */}
-          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#ffffff0a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0a_1px,transparent_1px)] bg-[size:4rem_4rem]" />
+        <PageHero bare className="py-0 sm:py-0">
 
           <div className="relative mx-auto max-w-[1720px] px-4 py-8 sm:px-6 lg:px-8 xl:px-10 lg:py-11">
             <div className="flex flex-col items-start justify-between gap-8 xl:flex-row xl:items-center">
@@ -632,7 +616,7 @@ export default function EcotourismPage() {
               </div>
             </div>
           </div>
-        </section>
+        </PageHero>
 
         {/* ================= 2. LEAN SEASON MODE BANNER ================= */}
         <section className="mx-auto max-w-[1720px] px-4 pt-6 sm:px-6 lg:px-8 xl:px-10">

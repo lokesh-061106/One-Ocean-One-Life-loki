@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Award, MapPin, User, Calendar, Plus } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { PageHero } from "@/components/layout/page-hero";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getPublicContributions } from "@/features/contributions";
@@ -75,24 +76,19 @@ export default function ContributionsPublicPage() {
     <div className="min-h-screen bg-ocean-foam">
       <Header />
       <main>
-        <section className="bg-gradient-to-r from-ocean-navy to-ocean-blue py-16">
-          <div className="max-w-7xl mx-auto px-4 text-center">
-            <Badge variant="secondary" className="mb-4 bg-white/20 text-white border-white/30">
-              Community
-            </Badge>
-            <h1 className="text-4xl font-bold text-white mb-4">Community Contributions</h1>
-            <p className="text-lg text-ocean-sand max-w-2xl mx-auto">
-              Verified observations, sightings, sounds, education posts and guides shared by coastal communities.
-            </p>
-            <Button
-              onClick={handleSubmitClick}
-              className="mt-6 bg-white text-ocean-navy hover:bg-white/90"
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Submit Contribution
-            </Button>
-          </div>
-        </section>
+        <PageHero
+          badge={<Badge variant="secondary" className="mb-4 bg-white/20 text-white border-white/30">Community</Badge>}
+          title="Community Contributions"
+          subtitle="Verified observations, sightings, sounds, education posts and guides shared by coastal communities."
+        >
+          <Button
+            onClick={handleSubmitClick}
+            className="mt-6 bg-white text-ocean-navy hover:bg-white/90"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Submit Contribution
+          </Button>
+        </PageHero>
 
         <div className="max-w-7xl mx-auto px-4 py-12 space-y-6">
           <div className="flex flex-wrap gap-2">

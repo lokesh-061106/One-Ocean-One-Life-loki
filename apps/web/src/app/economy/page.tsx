@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { PageHero } from "@/components/layout/page-hero";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
@@ -107,20 +108,7 @@ export default function EconomyPage() {
 
       <main className="w-full">
         {/* ================= 1. EXECUTIVE FULL-SCREEN HERO BANNER ================= */}
-        <section className="relative w-full overflow-hidden bg-[#031d2e] text-white">
-          {/* Deep Teal-Navy Gradient Base */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#011422] via-[#032a3f] to-[#064e6b]" />
-          
-          <div className="pointer-events-none absolute inset-0 opacity-15 mix-blend-luminosity">
-            <img
-              src="/shg/p1-banner-boats.webp"
-              alt=""
-              className="h-full w-full object-cover"
-            />
-          </div>
-
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#011422] via-transparent to-[#011422]/75" />
-          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#ffffff0a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0a_1px,transparent_1px)] bg-[size:4rem_4rem]" />
+        <PageHero bare className="py-0 sm:py-0">
 
           <div className="relative mx-auto max-w-[1720px] px-4 py-10 sm:px-6 lg:px-8 xl:px-10 lg:py-12">
             <div className="flex flex-col items-start justify-between gap-8 xl:flex-row xl:items-center">
@@ -228,7 +216,7 @@ export default function EconomyPage() {
               </div>
             </div>
           </div>
-        </section>
+        </PageHero>
 
         {/* ================= 2. ALL 7 SHG CIRCULAR MODULES GRID ================= */}
         <section className="mx-auto max-w-[1720px] px-4 py-11 sm:px-6 lg:px-8 xl:px-10">

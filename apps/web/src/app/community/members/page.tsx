@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Search, Filter, Users, Award, TrendingUp, User, MessageSquare, X, Star } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { PageHero } from "@/components/layout/page-hero";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -127,13 +128,11 @@ export default function MembersPage() {
     <div className="min-h-screen bg-ocean-foam">
       <Header />
       <main>
-        <section className="bg-gradient-to-r from-ocean-deep to-ocean-blue py-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <Badge variant="secondary" className="mb-4 bg-white/20 text-white border-white/30">Community Network</Badge>
-            <h1 className="text-4xl font-bold text-white mb-4">Community Members</h1>
-            <p className="text-lg text-ocean-sand max-w-2xl mx-auto">Connect with {stats.total}+ fishermen, researchers, and coastal communities.</p>
-          </div>
-        </section>
+        <PageHero
+          badge={<Badge variant="secondary" className="mb-4 bg-white/20 text-white border-white/30">Community Network</Badge>}
+          title="Community Members"
+          subtitle={`Connect with ${stats.total}+ fishermen, researchers, and coastal communities.`}
+        />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <Card><CardContent className="p-4"><div className="flex items-center gap-3"><div className="w-10 h-10 rounded-lg bg-ocean-blue/10 flex items-center justify-center"><Users className="h-5 w-5 text-ocean-blue" /></div><div><p className="text-2xl font-bold text-ocean-navy">{stats.total}</p><p className="text-sm text-ocean-text-secondary">Total Members</p></div></div></CardContent></Card>

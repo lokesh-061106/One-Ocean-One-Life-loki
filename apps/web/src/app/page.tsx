@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { PageHero } from "@/components/layout/page-hero";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -134,13 +135,7 @@ export default function HomePage() {
 
       <main>
         {/* Executive Hero Section */}
-        <section className="relative overflow-hidden bg-[#041c33] text-white">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#021120] via-[#052647] to-[#073a66]" />
-          <div className="pointer-events-none absolute inset-0 opacity-15 mix-blend-luminosity">
-            <img src="/shg/p1-banner-boats.webp" alt="" className="h-full w-full object-cover" />
-          </div>
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#021120] via-transparent to-[#021120]/75" />
-          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#ffffff0a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0a_1px,transparent_1px)] bg-[size:4rem_4rem]" />
+        <PageHero bare className="py-0 sm:py-0">
 
           <div className="relative mx-auto max-w-[1720px] px-4 py-20 sm:px-6 lg:px-8 xl:px-10 lg:py-28">
             <div className="text-center max-w-4xl mx-auto">
@@ -183,7 +178,7 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-        </section>
+        </PageHero>
 
         {/* Stats Section */}
         <section className="py-12 bg-white border-b border-slate-200">

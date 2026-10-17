@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Search, Eye, BookOpen } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { PageHero } from "@/components/layout/page-hero";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -109,25 +110,12 @@ export default function GuidesPage() {
     <div className="min-h-screen bg-ocean-foam">
       <Header />
       <main>
-        <section className="relative overflow-hidden bg-[#041c33] text-white py-16 sm:py-20">
-          <div className="absolute inset-0 bg-gradient-to-r from-[#021120] via-[#052647] to-[#073a66]" />
-          <div className="pointer-events-none absolute inset-0 opacity-15 mix-blend-luminosity">
-            <img src="/shg/p1-banner-boats.webp" alt="" className="h-full w-full object-cover" />
-          </div>
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#021120] via-transparent to-[#021120]/75" />
-
-          <div className="relative mx-auto max-w-[1720px] px-4 sm:px-6 lg:px-8 xl:px-10 text-center">
-            <Badge variant="secondary" className="mb-4 bg-sky-950/80 text-amber-300 border-sky-400/40 font-bold tracking-wider uppercase text-xs">
-              Marine Knowledge Base
-            </Badge>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4 drop-shadow-md">
-              Ocean Guides
-            </h1>
-            <p className="text-sm sm:text-base md:text-lg text-slate-100 max-w-2xl mx-auto font-medium">
-              Comprehensive identification guides for {species.length}+ marine species, habitats, and ecosystems along the Southern India coast.
-            </p>
-          </div>
-        </section>
+        <PageHero
+          width="wide"
+          badge={<Badge variant="secondary" className="mb-4 bg-sky-950/80 text-amber-300 border-sky-400/40 font-bold tracking-wider uppercase text-xs">Marine Knowledge Base</Badge>}
+          title="Ocean Guides"
+          subtitle={`Comprehensive identification guides for ${species.length}+ marine species, habitats, and ecosystems along the Southern India coast.`}
+        />
 
         <div className="mx-auto max-w-[1720px] px-4 sm:px-6 lg:px-8 xl:px-10 py-12">
           <div className="flex flex-col sm:flex-row gap-4 mb-8">

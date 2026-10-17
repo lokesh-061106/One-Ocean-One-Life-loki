@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Mail, Phone, MapPin, Clock, ChevronDown, ChevronUp, HelpCircle } from "lucide-react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { PageHero } from "@/components/layout/page-hero";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -36,13 +37,11 @@ export default function ContactPage() {
     <div className="min-h-screen bg-ocean-foam">
       <Header />
       <main>
-        <section className="bg-gradient-to-r from-ocean-deep to-ocean-blue py-20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <Badge variant="secondary" className="mb-4 bg-white/20 text-white border-white/30">Get in Touch</Badge>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">{cms?.hero_title || "Contact Us"}</h1>
-            <p className="text-xl text-ocean-sand max-w-3xl mx-auto">{cms?.hero_subtitle || "Have questions? We would love to hear from you."}</p>
-          </div>
-        </section>
+        <PageHero
+          badge={<Badge variant="secondary" className="mb-4 bg-white/20 text-white border-white/30">Get in Touch</Badge>}
+          title={cms?.hero_title || "Contact Us"}
+          subtitle={cms?.hero_subtitle || "Have questions? We would love to hear from you."}
+        />
 
         <section className="py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
