@@ -1,7 +1,7 @@
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.contrib.gis.geos import Point
+from django.contrib.gis.geos import Point, Polygon
 from django.contrib.gis.measure import D
 from django.db.models import Q
 from core.permissions import IsAdmin
@@ -242,3 +242,455 @@ class MapObservationsView(APIView):
             result['sounds'] = sounds
 
         return Response(result)
+
+
+# ---------------------------------------------------------------------------
+# Contributor map — contribution counts per village / district / zone / state
+# ---------------------------------------------------------------------------
+
+CONTRIBUTOR_LEVELS = ('state', 'zone', 'district', 'village')
+MAX_CONTRIBUTOR_ROWS = 20000
+MAX_POINT_RESOLUTIONS = 2000
+
+
+def _is_true(value):
+    return str(value).lower() in ('1', 'true', 'yes', 'on')
+
+
+def _parse_bbox(value):
+    """Parse "minLng,minLat,maxLng,maxLat" into a 4326 Polygon (or None)."""
+    if not value:
+        return None
+    try:
+        parts = [float(x) for x in str(value).split(',')]
+    except (TypeError, ValueError):
+        return None
+    if len(parts) != 4:
+        return None
+    minx, miny, maxx, maxy = parts
+    if minx >= maxx or miny >= maxy:
+        return None
+    poly = Polygon.from_bbox((minx, miny, maxx, maxy))
+    poly.srid = 4326
+    return poly
+
+
+def _base_public_contributions(request):
+    """Public/verified contributions that carry a location — the map's dataset."""
+    from contributions.models import Contribution
+
+    qs = Contribution.objects.filter(location__isnull=False).filter(
+        Q(status='verified')
+        | Q(visibility_status__in=['COMMUNITY_VISIBLE', 'MARKETPLACE_VISIBLE'])
+    )
+
+    contrib_type = request.query_params.get('type')
+    if contrib_type and contrib_type != 'all':
+        qs = qs.filter(type=contrib_type)
+
+    if _is_true(request.query_params.get('is_coastal')):
+        qs = qs.filter(village__is_coastal=True)
+
+    date_from = request.query_params.get('date_from')
+    if date_from:
+        qs = qs.filter(created_at__date__gte=date_from)
+    date_to = request.query_params.get('date_to')
+    if date_to:
+        qs = qs.filter(created_at__date__lte=date_to)
+
+    bbox = _parse_bbox(request.query_params.get('bbox'))
+    if bbox is not None:
+        qs = qs.filter(location__within=bbox)
+
+    return qs, bbox
+
+
+def _build_geo_context():
+    """Preload location trees and derive state/zone/district centroids."""
+    from locations.models import Village, District, Zone, StateFisheriesProfile
+
+    villages = {}
+    district_acc = {}
+    for v in Village.objects.values(
+        'id', 'name', 'slug', 'district_id', 'district__name', 'district__slug',
+        'district__zone_id', 'district__zone__name', 'district__state',
+        'latitude', 'longitude', 'center',
+    ):
+        if v['latitude'] is None and v['center'] is not None:
+            v['latitude'] = v['center'].y
+            v['longitude'] = v['center'].x
+        villages[v['id']] = v
+        if v['latitude'] is not None and v['longitude'] is not None and v['district_id']:
+            acc = district_acc.setdefault(v['district_id'], [0.0, 0.0, 0])
+            acc[0] += v['latitude']
+            acc[1] += v['longitude']
+            acc[2] += 1
+
+    districts = {}
+    for d in District.objects.values('id', 'name', 'slug', 'state', 'zone_id'):
+        acc = district_acc.get(d['id'])
+        d['latitude'] = round(acc[0] / acc[2], 5) if acc and acc[2] else None
+        d['longitude'] = round(acc[1] / acc[2], 5) if acc and acc[2] else None
+        districts[d['id']] = d
+
+    zone_acc = {}
+    for d in districts.values():
+        if d['latitude'] is not None and d['zone_id']:
+            acc = zone_acc.setdefault(d['zone_id'], [0.0, 0.0, 0])
+            acc[0] += d['latitude']
+            acc[1] += d['longitude']
+            acc[2] += 1
+
+    zones = {}
+    for z in Zone.objects.values('id', 'name', 'slug'):
+        acc = zone_acc.get(z['id'])
+        z['latitude'] = round(acc[0] / acc[2], 5) if acc and acc[2] else None
+        z['longitude'] = round(acc[1] / acc[2], 5) if acc and acc[2] else None
+        zones[z['id']] = z
+
+    states = {
+        sp['state'].lower(): sp
+        for sp in StateFisheriesProfile.objects.values('state', 'latitude', 'longitude')
+    }
+    # Fallback state centroid = mean of its district centroids.
+    state_acc = {}
+    for d in districts.values():
+        if d['latitude'] is not None and d['state']:
+            acc = state_acc.setdefault(d['state'].lower(), [d['state'], 0.0, 0.0, 0])
+            acc[1] += d['latitude']
+            acc[2] += d['longitude']
+            acc[3] += 1
+    for key, (label, lat_sum, lng_sum, count) in state_acc.items():
+        if key not in states:
+            states[key] = {
+                'state': label,
+                'latitude': round(lat_sum / count, 5),
+                'longitude': round(lng_sum / count, 5),
+            }
+
+    return {'villages': villages, 'districts': districts, 'zones': zones, 'states': states}
+
+
+def _resolve_point(loc, cache, ctx):
+    """Best-effort assign a bare point to a village/district via PostGIS contains."""
+    if loc is None:
+        return None
+    key = (round(loc.x, 4), round(loc.y, 4))
+    if key in cache:
+        return cache[key]
+
+    from locations.models import Village, District
+
+    result = None
+    village = Village.objects.filter(boundary__contains=loc).select_related('district').first()
+    if village:
+        result = {
+            'village_id': village.id,
+            'district_id': village.district_id,
+            'zone_id': village.district.zone_id,
+            'state': village.district.state,
+        }
+    else:
+        district = District.objects.filter(boundary__contains=loc).first()
+        if district:
+            result = {
+                'village_id': None,
+                'district_id': district.id,
+                'zone_id': district.zone_id,
+                'state': district.state,
+            }
+    cache[key] = result
+    return result
+
+
+class ContributorAggregateView(APIView):
+    """
+    GET /maps/contributors/?level=state|zone|district|village&parent=...
+
+    Aggregates public/verified contributions by area for the contributor map.
+    Counts only — exact coordinates are never exposed here.
+    """
+
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        level = request.query_params.get('level', 'state')
+        if level not in CONTRIBUTOR_LEVELS:
+            level = 'state'
+        parent = (request.query_params.get('parent') or '').strip() or None
+
+        qs, _bbox = _base_public_contributions(request)
+        rows = list(qs.values(
+            'location', 'village_id', 'zone_id', 'user_id', 'points', 'status',
+        )[:MAX_CONTRIBUTOR_ROWS])
+        truncated = len(rows) >= MAX_CONTRIBUTOR_ROWS
+
+        ctx = _build_geo_context()
+        villages, districts, zones, states = (
+            ctx['villages'], ctx['districts'], ctx['zones'], ctx['states'],
+        )
+
+        resolve = _is_true(request.query_params.get('resolve', '1'))
+        resolve_cache = {}
+        resolved = 0
+        parent_key = parent.lower() if parent else None
+
+        groups = {}
+
+        for row in rows:
+            vid = row['village_id']
+            zid = row['zone_id']
+            did = None
+            state = None
+
+            if vid and vid in villages:
+                v = villages[vid]
+                did = v['district_id']
+                zid = v['district__zone_id']
+                state = v['district__state']
+            elif resolve and resolved < MAX_POINT_RESOLUTIONS:
+                res = _resolve_point(row['location'], resolve_cache, ctx)
+                resolved += 1
+                if res:
+                    vid = res['village_id']
+                    did = res['district_id']
+                    zid = res['zone_id']
+                    state = res['state']
+
+            if parent_key:
+                if level == 'zone' and (state or '').lower() != parent_key:
+                    continue
+                if level == 'district' and (zones.get(zid, {}) or {}).get('slug') != parent_key:
+                    continue
+                if level == 'village' and (districts.get(did, {}) or {}).get('slug') != parent_key:
+                    continue
+
+            if level == 'state':
+                key = state or 'Unassigned'
+                sp = states.get((state or '').lower())
+                entry = {
+                    'id': (state or '').lower() or None,
+                    'name': state or 'Unassigned',
+                    'slug': (state or '').lower().replace(' ', '-') or None,
+                    'latitude': sp['latitude'] if sp else None,
+                    'longitude': sp['longitude'] if sp else None,
+                }
+            elif level == 'zone':
+                z = zones.get(zid)
+                key = zid or 'Unassigned'
+                entry = {
+                    'id': str(zid) if zid else None,
+                    'name': z['name'] if z else 'Unassigned',
+                    'slug': z['slug'] if z else None,
+                    'latitude': z['latitude'] if z else None,
+                    'longitude': z['longitude'] if z else None,
+                }
+            elif level == 'district':
+                d = districts.get(did)
+                key = did or 'Unassigned'
+                entry = {
+                    'id': str(did) if did else None,
+                    'name': d['name'] if d else 'Unassigned',
+                    'slug': d['slug'] if d else None,
+                    'latitude': d['latitude'] if d else None,
+                    'longitude': d['longitude'] if d else None,
+                }
+            else:  # village
+                v = villages.get(vid)
+                key = vid or 'Unassigned'
+                entry = {
+                    'id': str(vid) if vid else None,
+                    'name': v['name'] if v else 'Unassigned',
+                    'slug': v['slug'] if v else None,
+                    'latitude': v['latitude'] if v else None,
+                    'longitude': v['longitude'] if v else None,
+                }
+
+            group = groups.setdefault(key, {
+                **entry,
+                'level': level,
+                'contributions': 0,
+                'verified': 0,
+                'points': 0,
+                'contributors': set(),
+            })
+            group['contributions'] += 1
+            if row['status'] == 'verified':
+                group['verified'] += 1
+            group['points'] += row['points'] or 0
+            group['contributors'].add(row['user_id'])
+
+        result_rows = []
+        totals = {'contributions': 0, 'verified': 0, 'points': 0, 'contributors': set()}
+        for group in groups.values():
+            totals['contributions'] += group['contributions']
+            totals['verified'] += group['verified']
+            totals['points'] += group['points']
+            totals['contributors'] |= group['contributors']
+            group['contributors'] = len(group['contributors'])
+            result_rows.append(group)
+
+        result_rows.sort(key=lambda r: (-r['contributions'], -r['points'], r['name'] or ''))
+        totals['contributors'] = len(totals['contributors'])
+
+        return Response({
+            'level': level,
+            'parent': parent,
+            'totals': totals,
+            'rows': result_rows,
+            'truncated': truncated,
+        })
+
+
+class ContributorPeopleView(APIView):
+    """
+    GET /maps/contributors/people/?bbox=minLng,minLat,maxLng,maxLat
+
+    Opted-in contributors (Profile.appear_on_map) with their village-level
+    location and verified-contribution score. No exact contribution points.
+    """
+
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        from accounts.models import Profile
+        from contributions.models import Contribution
+        from recognition.models import ContributionScore
+
+        bbox = _parse_bbox(request.query_params.get('bbox'))
+        bounds = bbox.extent if bbox is not None else None
+
+        profiles = list(
+            Profile.objects
+            .filter(appear_on_map=True, latitude__isnull=False, longitude__isnull=False)
+            .select_related('user', 'village', 'village__district', 'village__district__zone')
+        )
+
+        limit = int(request.query_params.get('limit', 1000))
+        user_ids = [p.user_id for p in profiles]
+
+        scores = {
+            cs.user_id: cs
+            for cs in ContributionScore.objects.filter(user_id__in=user_ids)
+        }
+
+        # Fall back to the contributor's latest contribution village when the
+        # profile itself has no village set.
+        village_by_user = {}
+        for row in (
+            Contribution.objects
+            .filter(user_id__in=user_ids, village__isnull=False)
+            .order_by('user_id', '-created_at')
+            .values(
+                'user_id', 'village__name', 'village__district__name',
+                'village__district__state',
+            )
+        ):
+            village_by_user.setdefault(row['user_id'], row)
+
+        rows = []
+        for p in profiles:
+            if bounds:
+                minx, miny, maxx, maxy = bounds
+                if not (minx <= p.longitude <= maxx and miny <= p.latitude <= maxy):
+                    continue
+            cs = scores.get(p.user_id)
+            village = p.village
+            district = village.district if village else None
+            fallback = village_by_user.get(p.user_id, {})
+
+            if p.show_village:
+                village_name = village.name if village else fallback.get('village__name')
+                district_name = (
+                    district.name if district
+                    else fallback.get('village__district__name')
+                )
+                state_name = (
+                    district.state if district
+                    else fallback.get('village__district__state')
+                )
+            else:
+                village_name = district_name = state_name = None
+
+            rows.append({
+                'user': str(p.user_id),
+                'name': f"{p.user.first_name} {p.user.last_name}".strip() or p.user.username,
+                'contributor_type': p.contributor_type,
+                'village': village_name,
+                'district': district_name,
+                'state': state_name,
+                'latitude': p.latitude,
+                'longitude': p.longitude,
+                'verified_contributions': cs.verified_contributions if cs else 0,
+                'total_score': cs.total_score if cs else 0,
+                'tier': cs.tier if cs else 'new',
+                'earnings_inr': (cs.earnings_inr if cs else 0) if p.show_earnings else None,
+                'earnings_hidden': not p.show_earnings,
+                'can_connect': p.allow_connection_requests,
+            })
+            if len(rows) >= limit:
+                break
+
+        return Response({'count': len(rows), 'results': rows})
+
+
+class ContributorPointsView(APIView):
+    """
+    GET /maps/contributors/points/?bbox=...&type=...
+
+    Exact contribution points — only for contributions whose author opted in
+    to the public contributor map (Profile.appear_on_map).
+    """
+
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        from contributions.models import Contribution
+
+        qs = (
+            Contribution.objects
+            .filter(
+                location__isnull=False,
+                user__profile__appear_on_map=True,
+            )
+            .filter(
+                Q(status='verified')
+                | Q(visibility_status__in=['COMMUNITY_VISIBLE', 'MARKETPLACE_VISIBLE'])
+            )
+            .select_related('village', 'village__district', 'user')
+        )
+
+        contrib_type = request.query_params.get('type')
+        if contrib_type and contrib_type != 'all':
+            qs = qs.filter(type=contrib_type)
+
+        bbox = _parse_bbox(request.query_params.get('bbox'))
+        if bbox is not None:
+            qs = qs.filter(location__within=bbox)
+
+        limit = int(request.query_params.get('limit', 500))
+
+        points = []
+        for c in qs[:limit]:
+            loc = c.location
+            if not loc:
+                continue
+            village = c.village
+            district = village.district if village else None
+            points.append({
+                'id': str(c.id),
+                'latitude': loc.y,
+                'longitude': loc.x,
+                'type': c.type,
+                'type_display': c.get_type_display(),
+                'status': c.status,
+                'points': c.points,
+                'created_at': c.created_at.isoformat(),
+                'contributor': c.author or c.user.username,
+                'contributor_type': c.contributor_type,
+                'village': village.name if village else None,
+                'district': district.name if district else None,
+                'state': district.state if district else None,
+            })
+
+        return Response({'count': len(points), 'results': points})

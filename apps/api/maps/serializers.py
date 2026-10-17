@@ -103,3 +103,63 @@ class SoundMarkerSerializer(serializers.Serializer):
     duration_seconds = serializers.FloatField(allow_null=True)
     recording_date = serializers.DateField(allow_null=True)
     created_at = serializers.DateTimeField()
+
+
+class ContributorAggregateRowSerializer(serializers.Serializer):
+    """One area row in the contributor map (state / zone / district / village)."""
+
+    id = serializers.CharField(allow_null=True)
+    name = serializers.CharField()
+    slug = serializers.CharField(allow_null=True)
+    level = serializers.CharField()
+    latitude = serializers.FloatField(allow_null=True)
+    longitude = serializers.FloatField(allow_null=True)
+    contributions = serializers.IntegerField()
+    verified = serializers.IntegerField()
+    points = serializers.IntegerField()
+    contributors = serializers.IntegerField()
+
+
+class ContributorAggregateResponseSerializer(serializers.Serializer):
+    level = serializers.CharField()
+    parent = serializers.JSONField(allow_null=True)
+    totals = serializers.JSONField()
+    rows = ContributorAggregateRowSerializer(many=True)
+    truncated = serializers.BooleanField()
+
+
+class ContributorPersonSerializer(serializers.Serializer):
+    """An opted-in contributor shown on the public map."""
+
+    user = serializers.CharField()
+    name = serializers.CharField()
+    contributor_type = serializers.CharField(allow_blank=True)
+    village = serializers.CharField(allow_null=True)
+    district = serializers.CharField(allow_null=True)
+    state = serializers.CharField(allow_null=True)
+    latitude = serializers.FloatField()
+    longitude = serializers.FloatField()
+    verified_contributions = serializers.IntegerField()
+    total_score = serializers.IntegerField()
+    tier = serializers.CharField()
+    earnings_inr = serializers.IntegerField(allow_null=True)
+    earnings_hidden = serializers.BooleanField()
+    can_connect = serializers.BooleanField()
+
+
+class ContributorPointSerializer(serializers.Serializer):
+    """An exact contribution point, only exposed for opted-in contributors."""
+
+    id = serializers.UUIDField()
+    latitude = serializers.FloatField()
+    longitude = serializers.FloatField()
+    type = serializers.CharField()
+    type_display = serializers.CharField()
+    status = serializers.CharField()
+    points = serializers.IntegerField()
+    created_at = serializers.DateTimeField()
+    contributor = serializers.CharField()
+    contributor_type = serializers.CharField(allow_blank=True)
+    village = serializers.CharField(allow_null=True)
+    district = serializers.CharField(allow_null=True)
+    state = serializers.CharField(allow_null=True)

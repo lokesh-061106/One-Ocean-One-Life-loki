@@ -5,6 +5,7 @@ import { Layers, X } from "lucide-react";
 import LayerPanel from "@/components/map/layer-panel";
 import MarineMap, { type BasemapMode } from "@/components/map/marine-map";
 import ProfileDashboard from "@/components/map/profile-dashboard";
+import ContributorDashboard from "@/components/map/contributor-dashboard";
 import { useMarineGeo } from "@/hooks/use-marine-geo";
 import {
   BIODIVERSITY_POINTS,
@@ -30,6 +31,7 @@ import {
 
 export default function MarineDashboard() {
   const { data: geo } = useMarineGeo();
+  const [mode, setMode] = useState<"fisheries" | "contributors">("fisheries");
   const [activeLayers, setActiveLayers] = useState<string[]>(DEFAULT_LAYERS);
   const [basemap, setBasemap] = useState<BasemapMode>("satellite");
   const [selectedState, setSelectedState] = useState<StateSlug>("tamil-nadu");
@@ -106,8 +108,32 @@ export default function MarineDashboard() {
 
   return (
     <div className="space-y-4">
-      {/* toolbar */}
-      <div className="bg-white border border-slate-200 rounded-xl shadow-sm px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
+      {/* mode switch */}
+      <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-1 flex items-center gap-1 w-fit">
+        {(
+          [
+            { id: "fisheries", label: "Fisheries GIS" },
+            { id: "contributors", label: "Contributors" },
+          ] as const
+        ).map((m) => (
+          <button
+            key={m.id}
+            onClick={() => setMode(m.id)}
+            className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-colors ${
+              mode === m.id ? "bg-ocean-navy text-white" : "text-slate-500 hover:bg-slate-50"
+            }`}
+          >
+            {m.label}
+          </button>
+        ))}
+      </div>
+
+      {mode === "contributors" ? (
+        <ContributorDashboard />
+      ) : (
+        <>
+          {/* toolbar */}
+          <div className="bg-white border border-slate-200 rounded-xl shadow-sm px-4 py-2.5 flex flex-wrap items-center justify-between gap-3">
         <nav className="flex flex-wrap gap-1">
           {DASH_TABS.map((tab) => (
             <a
@@ -207,6 +233,8 @@ export default function MarineDashboard() {
             </div>
           </div>
         </div>
+      )}
+        </>
       )}
     </div>
   );

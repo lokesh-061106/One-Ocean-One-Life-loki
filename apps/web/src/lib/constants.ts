@@ -72,6 +72,9 @@ export const ENDPOINTS = {
     HOTSPOTS: '/maps/hotspots/',
     EMERGENCY_CONTACTS: '/maps/emergency/contacts/',
     EMERGENCY_NEARBY: '/maps/emergency/nearby/',
+    CONTRIBUTOR_AGGREGATES: '/maps/contributors/',
+    CONTRIBUTOR_PEOPLE: '/maps/contributors/people/',
+    CONTRIBUTOR_POINTS: '/maps/contributors/points/',
   },
   RECOGNITION: {
     AWARDS: '/recognition/awards/',
